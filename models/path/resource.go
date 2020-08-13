@@ -49,20 +49,11 @@ func Resource(api *swagger.Instance, target swagger.Definition, scopes ...*scope
 	res.path(
 		Scope(fmt.Sprintf("/%s", resourceName), fmt.Sprintf(target.GetName())).Routes(
 			api.Route(Endpoint(Inherit, "List")).SetMethod(methods.GET).
-				Responds(
-					response.Response(200, model.Array(target.GetRef())),
-				),
+				Responds(response.Response(200, model.Array(target.GetRef()))),
 			api.Route(Endpoint(Inherit, "Create")).SetMethod(methods.POST).
-				Consumes(
-					mimes.MultipartFormData,
-					mimes.ApplicationJson,
-				).
-				Param(
-					params.Param(resourceName, target.GetRef()).In(locations.BODY),
-				).
-				Responds(
-					response.Response(200, target.GetRef()),
-				),
+				Consumes(mimes.MultipartFormData, mimes.ApplicationJson).
+				Param(params.Param(resourceName, target.GetRef()).In(locations.BODY)).
+				Responds(response.Response(200, target.GetRef())),
 			api.Route(
 				res.child(Scope(fmt.Sprintf("/{%s}", resourceId), Inherit).Routes(
 					append(
@@ -73,16 +64,13 @@ func Resource(api *swagger.Instance, target swagger.Definition, scopes ...*scope
 						api.Route(Endpoint(Inherit, "Destroy").SetMethod(methods.DELETE)),
 					)...,
 				)),
-			).Param(
-				params.Int(resourceId).In(locations.PATH),
-			).Responds(
-				response.Response(200, target.GetRef()),
-			),
-		).Produces(
-			mimes.ApplicationJson,
-		).Responds(
-			response.Response(500, model.Array(model.String())),
-		).Tag(api.Tag(tags.Tag(resourceName, "Default crud resources"))),
+			).
+				Param(params.Int(resourceId).In(locations.PATH)).
+				Responds(response.Response(200, target.GetRef())),
+		).
+			Produces(mimes.ApplicationJson).
+			Responds(response.Response(500, model.Array(model.String()))).
+			Tag(api.Tag(tags.Tag(resourceName, "Default crud resources"))),
 	)
 
 	return res

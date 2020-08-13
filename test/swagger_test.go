@@ -105,7 +105,7 @@ func TestSwaggerInit(t *testing.T) {
 	api.Route(path.Resource(api, category, path.Scope(path.Inherit, path.Inherit).Routes(
 		api.Route(path.Resource(api, offer)),
 	)))
-	api.Route(path.Resource(api, shop))
+	//api.Route(path.Resource(api, shop))
 
 	err := io.Save(api, "swagger.yaml")
 	if err != nil {

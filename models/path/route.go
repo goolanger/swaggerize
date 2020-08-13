@@ -103,7 +103,9 @@ func (e *endpoint) GetRep() map[string]interface{} {
 		resp := make(map[string]interface{})
 
 		for _, r := range e.responses {
-			resp[r.GetCode()] = r.GetRep()
+			if _, ok := resp[r.GetCode()]; !ok {
+				resp[r.GetCode()] = r.GetRep()
+			}
 		}
 
 		rep["responses"] = resp
