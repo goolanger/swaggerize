@@ -28,10 +28,18 @@ type Path interface {
 	GetMethod() string
 	GetRep() map[string]interface{}
 
-	Param(d ...Parameter) Path
-	Tag(t ...Tag) Path
-	Produces(p ...mimes.Type) Path
+
 	Consumes(c ...mimes.Type) Path
+	Param(d ...Parameter) Path
+	Produces(p ...mimes.Type) Path
+	Responds(r ...Response) Path
+ 	Tag(t ...Tag) Path
+
+}
+
+type Response interface {
+	GetCode() string
+	GetRep() map[string]interface{}
 }
 
 type Instance struct {

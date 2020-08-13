@@ -4,7 +4,11 @@ import (
 	"github.com/goolanger/swaggerize/models/document"
 	"github.com/goolanger/swaggerize/models/document/licences"
 	"github.com/goolanger/swaggerize/models/obj"
+	"github.com/goolanger/swaggerize/models/path"
+	"github.com/goolanger/swaggerize/models/response"
 	"github.com/goolanger/swaggerize/models/swagger"
+	"github.com/goolanger/swaggerize/models/types/methods"
+	"github.com/goolanger/swaggerize/models/types/mimes"
 	"github.com/goolanger/swaggerize/models/types/scheme"
 	"github.com/goolanger/swaggerize/pkg/io"
 	"testing"
@@ -78,7 +82,7 @@ func TestSwaggerInit(t *testing.T) {
 		),
 	)
 
-	api.Define(obj.Object("Shop").Props(
+	shop := api.Define(obj.Object("Shop").Props(
 		obj.Property("id", obj.Int()).
 			Tag("x-go-custom-tag", "gorm:\"primary_key\""),
 		obj.Property("name", obj.String()).
@@ -101,41 +105,20 @@ func TestSwaggerInit(t *testing.T) {
 		obj.Property("roles", obj.Array(obj.String())),
 	))
 
-	//api.Route(
-	//	path.Scope("/users").Routes(
-	//		api.Route(path.Endpoint(path.Inherit)),
-	//		api.Route(path.Endpoint(path.Inherit).
-	//			SetMethod(methods.POST)),
-	//		api.Route(path.Scope("/{id}").
-	//			Routes(api.Route(path.Endpoint(path.Inherit).
-	//				SetMethod(methods.PUT)).
-	//				Param(
-	//					params.Param("user").In(locations.BODY).Type(category),
-	//				).
-	//				Consumes(mimes.MultipartFormData),
-	//				api.Route(path.Endpoint(path.Inherit).
-	//					SetMethod(methods.DELETE)),
-	//			),
-	//		),
-	//	).
-	//		Produces(mimes.ApplicationJson).
-	//		Consumes(mimes.ApplicationJson).
-	//		Param(
-	//			params.Param("script").In(locations.PATH).Type(obj.Array(obj.Int())),
-	//			params.Param("name").In(locations.PATH).Type(obj.Array(obj.String())),
-	//		).
-	//		Tag(
-	//			api.Tag(tag.New("users")),
-	//			api.Tag(tag.New("scaffold")),
-	//		),
-	//)
-	//api.Route(path.Endpoint("/api").Produces(mimes.TextHtml))
+	api.Route(path.Scope("/shop").Routes(
+		api.Route(path.Endpoint(path.Inherit).SetMethod(methods.POST)),
+		api.Route(path.Endpoint(path.Inherit).SetMethod(methods.PUT)),
+		api.Route(path.Endpoint(path.Inherit).SetMethod(methods.PATCH)),
+	).
+		Consumes(mimes.ApplicationJson).
+		Produces(mimes.ApplicationJson).
+		Responds(
+			response.Response(200, obj.Array(shop.GetRef())),
+			response.Response(404, obj.String()),
+			response.Response(500, obj.String()),
+		))
 
 	printSwagger(api, t)
-	err := io.Save(api, "swagger.yaml")
-	if err != nil {
-		t.Fatal(err)
-	}
 }
 
 func printSwagger(specs *swagger.Instance, t *testing.T) {

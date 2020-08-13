@@ -14,84 +14,100 @@ type endpoint struct {
 
 	produces, consumes []mimes.Type
 	parameters         []swagger.Parameter
+	responses          []swagger.Response
 	tags               []swagger.Tag
 }
 
-func (r *endpoint) SetPath(s string) swagger.Path {
-	r.path = s
-	return r
+func (e *endpoint) SetPath(s string) swagger.Path {
+	e.path = s
+	return e
 }
 
-func (r *endpoint) SetMethod(m methods.Type) swagger.Path {
-	r.method = m
-	return r
+func (e *endpoint) SetMethod(m methods.Type) swagger.Path {
+	e.method = m
+	return e
 }
 
-func (r *endpoint) GetMethod() string {
-	if r.method == "" {
-		r.method = methods.GET
+func (e *endpoint) GetMethod() string {
+	if e.method == "" {
+		e.method = methods.GET
 	}
-	return string(r.method)
+	return string(e.method)
 }
 
 
-func (r *endpoint) GetPath() string {
-	return r.path
+func (e *endpoint) GetPath() string {
+	return e.path
 }
 
-func (r *endpoint) Param(d ...swagger.Parameter) swagger.Path {
-	r.parameters = append(r.parameters, d...)
-	return r
+func (e *endpoint) Param(d ...swagger.Parameter) swagger.Path {
+	e.parameters = append(e.parameters, d...)
+	return e
 }
 
-func (r *endpoint) Tag(t ...swagger.Tag) swagger.Path {
-	r.tags = append(r.tags, t...)
-	return r
+func (e *endpoint) Tag(t ...swagger.Tag) swagger.Path {
+	e.tags = append(e.tags, t...)
+	return e
 }
 
-func (r *endpoint)Produces(p ...mimes.Type) swagger.Path{
-	r.produces = append(r.produces, p...)
-	return r
+func (e *endpoint)Produces(p ...mimes.Type) swagger.Path{
+	e.produces = append(e.produces, p...)
+	return e
 }
 
-func (r *endpoint)Consumes(c ...mimes.Type) swagger.Path {
-	r.consumes = append(r.consumes, c...)
-	return r
+func (e *endpoint)Consumes(c ...mimes.Type) swagger.Path {
+	e.consumes = append(e.consumes, c...)
+	return e
 }
 
-func (r *endpoint) GetRep() map[string]interface{} {
+func (e *endpoint) Responds(r ...swagger.Response) swagger.Path {
+	e.responses = append(e.responses, r...)
+	return e
+}
+
+func (e *endpoint) GetRep() map[string]interface{} {
 	rep:= make(map[string]interface{})
 
-	if r.description != "" {
-		rep["description"] = r.description
+	if e.description != "" {
+		rep["description"] = e.description
 	}
 
-	if len(r.tags) > 0 {
+	if len(e.tags) > 0 {
 		var tags []string
-		for _, t := range r.tags {
+		for _, t := range e.tags {
 			tags = append(tags, t.GetName())
 		}
 		rep["tags"] = tags
 	}
 
-	if len(r.produces) > 0 {
-		rep["produces"] = r.produces
+	if len(e.produces) > 0 {
+		rep["produces"] = e.produces
 	}
 
-	if len(r.consumes) > 0 {
-		rep["consumes"] = r.consumes
+	if len(e.consumes) > 0 {
+		rep["consumes"] = e.consumes
 	}
 
-	if len(r.parameters) > 0 {
+	if len(e.responses) > 0 {
+		resp := make(map[string]interface{})
+
+		for _, r := range e.responses {
+			resp[r.GetCode()] = r.GetRep()
+		}
+
+		rep["responses"] = resp
+	}
+
+	if len(e.parameters) > 0 {
 		var params []map[string]interface{}
-		for _, p := range r.parameters {
+		for _, p := range e.parameters {
 			params = append(params, p.GetRep())
 		}
 		rep["parameters"] = params
 	}
 
 	return map[string]interface{}{
-		r.GetMethod(): rep,
+		e.GetMethod(): rep,
 	}
 }
 

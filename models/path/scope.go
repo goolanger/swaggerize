@@ -15,6 +15,12 @@ type scope struct {
 	params []swagger.Parameter
 
 	produces, consumes []mimes.Type
+	responses []swagger.Response
+}
+
+func (s *scope) Responds(r ...swagger.Response) swagger.Path {
+	s.responses = append(s.responses, r...)
+	return s
 }
 
 func (s *scope) SetPath(p string) swagger.Path {
@@ -41,6 +47,7 @@ func (s *scope) GetRep() map[string]interface{} {
 		r.Tag(s.tags...)
 		r.Produces(s.produces...)
 		r.Consumes(s.consumes...)
+		r.Responds(s.responses...)
 	}
 	return nil
 }
