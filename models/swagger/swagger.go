@@ -70,8 +70,8 @@ func (specs *Instance) Schemes(s ...scheme.Type) *Instance {
 	return specs
 }
 
-func (specs *Instance) Host(h string) *Instance {
-	specs.host = &h
+func (specs *Instance) Host(host string) *Instance {
+	specs.host = &host
 	return specs
 }
 

@@ -1,4 +1,4 @@
-package obj
+package model
 
 import "github.com/goolanger/swaggerize/models/swagger"
 

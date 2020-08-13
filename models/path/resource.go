@@ -2,7 +2,7 @@ package path
 
 import (
 	"fmt"
-	"github.com/goolanger/swaggerize/models/obj"
+	"github.com/goolanger/swaggerize/models/model"
 	params "github.com/goolanger/swaggerize/models/parameter"
 	"github.com/goolanger/swaggerize/models/response"
 	"github.com/goolanger/swaggerize/models/swagger"
@@ -50,7 +50,7 @@ func Resource(api *swagger.Instance, target swagger.Definition, scopes ...*scope
 		Scope(fmt.Sprintf("/%s", resourceName), fmt.Sprintf(target.GetName())).Routes(
 			api.Route(Endpoint(Inherit, "List")).SetMethod(methods.GET).
 				Responds(
-					response.Response(200, obj.Array(target.GetRef())),
+					response.Response(200, model.Array(target.GetRef())),
 				),
 			api.Route(Endpoint(Inherit, "Create")).SetMethod(methods.POST).
 				Consumes(
@@ -81,7 +81,7 @@ func Resource(api *swagger.Instance, target swagger.Definition, scopes ...*scope
 		).Produces(
 			mimes.ApplicationJson,
 		).Responds(
-			response.Response(500, obj.Array(obj.String())),
+			response.Response(500, model.Array(model.String())),
 		).Tag(api.Tag(tags.Tag(resourceName, "Default crud resources"))),
 	)
 

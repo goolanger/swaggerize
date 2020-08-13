@@ -1,4 +1,4 @@
-package licences
+package licenses
 
 import "github.com/goolanger/swaggerize/models/document"
 
