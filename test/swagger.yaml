@@ -126,6 +126,7 @@ info:
 paths:
   /category:
     get:
+      operationId: CategoryList
       produces:
       - application/json
       responses:
@@ -147,6 +148,7 @@ paths:
       consumes:
       - multipart/form-data
       - application/json
+      operationId: CategoryCreate
       parameters:
       - in: body
         name: category
@@ -169,6 +171,7 @@ paths:
       - category
   /category/{categoryId}:
     delete:
+      operationId: CategoryDestroy
       parameters:
       - in: path
         name: categoryId
@@ -190,6 +193,7 @@ paths:
       tags:
       - category
     put:
+      operationId: CategoryUpdate
       parameters:
       - in: body
         name: category
@@ -214,17 +218,21 @@ paths:
             type: array
       tags:
       - category
-  /offer:
+  /category/{categoryId}/offer:
     get:
+      operationId: CategoryOfferList
+      parameters:
+      - in: path
+        name: categoryId
+        required: true
+        type: integer
       produces:
       - application/json
       responses:
         "200":
           description: ""
           schema:
-            items:
-              $ref: '#/definitions/Offer'
-            type: array
+            $ref: '#/definitions/Category'
         "500":
           description: ""
           schema:
@@ -233,22 +241,28 @@ paths:
             type: array
       tags:
       - offer
+      - category
     post:
       consumes:
       - multipart/form-data
       - application/json
+      operationId: CategoryOfferCreate
       parameters:
       - in: body
         name: offer
         schema:
           $ref: '#/definitions/Offer'
+      - in: path
+        name: categoryId
+        required: true
+        type: integer
       produces:
       - application/json
       responses:
         "200":
           description: ""
           schema:
-            $ref: '#/definitions/Offer'
+            $ref: '#/definitions/Category'
         "500":
           description: ""
           schema:
@@ -257,11 +271,17 @@ paths:
             type: array
       tags:
       - offer
-  /offer/{offerId}:
+      - category
+  /category/{categoryId}/offer/{offerId}:
     delete:
+      operationId: CategoryOfferDestroy
       parameters:
       - in: path
         name: offerId
+        required: true
+        type: integer
+      - in: path
+        name: categoryId
         required: true
         type: integer
       produces:
@@ -270,7 +290,7 @@ paths:
         "200":
           description: ""
           schema:
-            $ref: '#/definitions/Offer'
+            $ref: '#/definitions/Category'
         "500":
           description: ""
           schema:
@@ -279,7 +299,9 @@ paths:
             type: array
       tags:
       - offer
+      - category
     put:
+      operationId: CategoryOfferUpdate
       parameters:
       - in: body
         name: offer
@@ -289,13 +311,17 @@ paths:
         name: offerId
         required: true
         type: integer
+      - in: path
+        name: categoryId
+        required: true
+        type: integer
       produces:
       - application/json
       responses:
         "200":
           description: ""
           schema:
-            $ref: '#/definitions/Offer'
+            $ref: '#/definitions/Category'
         "500":
           description: ""
           schema:
@@ -304,8 +330,10 @@ paths:
             type: array
       tags:
       - offer
+      - category
   /shop:
     get:
+      operationId: ShopList
       produces:
       - application/json
       responses:
@@ -327,6 +355,7 @@ paths:
       consumes:
       - multipart/form-data
       - application/json
+      operationId: ShopCreate
       parameters:
       - in: body
         name: shop
@@ -349,6 +378,7 @@ paths:
       - shop
   /shop/{shopId}:
     delete:
+      operationId: ShopDestroy
       parameters:
       - in: path
         name: shopId
@@ -370,6 +400,7 @@ paths:
       tags:
       - shop
     put:
+      operationId: ShopUpdate
       parameters:
       - in: body
         name: shop
@@ -399,9 +430,9 @@ schemes:
 - http
 swagger: "2.0"
 tags:
-- name: category
-  description: Default crud resources
 - name: offer
+  description: Default crud resources
+- name: category
   description: Default crud resources
 - name: shop
   description: Default crud resources

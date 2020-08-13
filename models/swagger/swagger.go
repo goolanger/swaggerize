@@ -28,6 +28,8 @@ type Path interface {
 	SetMethod(m methods.Type)Path
 	GetMethod() string
 	GetRep() map[string]interface{}
+	GetId() string
+	SetId(id string) Path
 
 
 	Consumes(c ...mimes.Type) Path

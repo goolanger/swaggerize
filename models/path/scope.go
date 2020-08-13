@@ -7,7 +7,7 @@ import (
 )
 
 type scope struct {
-	path string
+	path, id string
 
 	routes []swagger.Path
 
@@ -16,6 +16,15 @@ type scope struct {
 
 	produces, consumes []mimes.Type
 	responses []swagger.Response
+}
+
+func (s *scope) GetId() string {
+	return s.id
+}
+
+func (s *scope) SetId(id string) swagger.Path {
+	s.id = id
+	return s
 }
 
 func (s *scope) Responds(r ...swagger.Response) swagger.Path {
@@ -42,6 +51,7 @@ func (s *scope) GetMethod() string {
 
 func (s *scope) GetRep() map[string]interface{} {
 	for _, r := range s.routes {
+		r.SetId(s.GetId() + r.GetId())
 		r.SetPath(s.GetPath() + r.GetPath())
 		r.Param(s.params...)
 		r.Tag(s.tags...)
@@ -77,9 +87,10 @@ func (s *scope) Routes(p ...swagger.Path) *scope {
 	return s
 }
 
-func Scope(path string) *scope {
+func Scope(path, id string) *scope {
 	return &scope{
 		path: path,
+		id:id,
 	}
 }
 

@@ -102,8 +102,9 @@ func TestSwaggerInit(t *testing.T) {
 	//	obj.Property("roles", obj.Array(obj.String())),
 	//))
 
-	api.Route(path.Resource(api, category))
-	api.Route(path.Resource(api, offer))
+	api.Route(path.Resource(api, category, path.Scope(path.Inherit, path.Inherit).Routes(
+		api.Route(path.Resource(api, offer)),
+	)))
 	api.Route(path.Resource(api, shop))
 
 	err := io.Save(api, "swagger.yaml")

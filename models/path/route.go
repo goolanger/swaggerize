@@ -9,13 +9,22 @@ import (
 const Inherit = ""
 
 type endpoint struct {
-	path, description string
+	path, description, id string
 	method            methods.Type
 
 	produces, consumes []mimes.Type
 	parameters         []swagger.Parameter
 	responses          []swagger.Response
 	tags               []swagger.Tag
+}
+
+func (e *endpoint) GetId() string {
+	return e.id
+}
+
+func (e *endpoint) SetId(id string) swagger.Path {
+	e.id = id
+	return e
 }
 
 func (e *endpoint) SetPath(s string) swagger.Path {
@@ -68,6 +77,8 @@ func (e *endpoint) Responds(r ...swagger.Response) swagger.Path {
 func (e *endpoint) GetRep() map[string]interface{} {
 	rep:= make(map[string]interface{})
 
+	rep["operationId"] = e.id
+
 	if e.description != "" {
 		rep["description"] = e.description
 	}
@@ -111,10 +122,11 @@ func (e *endpoint) GetRep() map[string]interface{} {
 	}
 }
 
-func Endpoint(path string) *endpoint {
+func Endpoint(path, id string) *endpoint {
 	return &endpoint{
 		method: methods.GET,
-		path: path,
+		path:   path,
+		id:     id,
 	}
 }
 

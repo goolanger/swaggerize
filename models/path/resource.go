@@ -29,7 +29,7 @@ func (res *resource) path(s swagger.Path) *resource {
 }
 
 func Resource(api *swagger.Instance, target swagger.Definition, scopes ...*scope) *resource {
-	scope := Scope(Inherit)
+	scope := Scope(Inherit, Inherit)
 	if len(scopes) > 0 {
 		for _, s := range scopes {
 			scope.Routes(s.routes...)
@@ -47,12 +47,12 @@ func Resource(api *swagger.Instance, target swagger.Definition, scopes ...*scope
 	resourceId := strings.ToLower(target.GetName()) + "Id"
 
 	res.path(
-		Scope(fmt.Sprintf("/%s", resourceName)).Routes(
-			api.Route(Endpoint(Inherit)).SetMethod(methods.GET).
+		Scope(fmt.Sprintf("/%s", resourceName), fmt.Sprintf(target.GetName())).Routes(
+			api.Route(Endpoint(Inherit, "List")).SetMethod(methods.GET).
 				Responds(
 					response.Response(200, obj.Array(target.GetRef())),
 				),
-			api.Route(Endpoint(Inherit)).SetMethod(methods.POST).
+			api.Route(Endpoint(Inherit, "Create")).SetMethod(methods.POST).
 				Consumes(
 					mimes.MultipartFormData,
 					mimes.ApplicationJson,
@@ -64,13 +64,13 @@ func Resource(api *swagger.Instance, target swagger.Definition, scopes ...*scope
 					response.Response(200, target.GetRef()),
 				),
 			api.Route(
-				res.child(Scope(fmt.Sprintf("/{%s}", resourceId)).Routes(
+				res.child(Scope(fmt.Sprintf("/{%s}", resourceId), Inherit).Routes(
 					append(
 						scope.routes,
-						api.Route(Endpoint(Inherit).SetMethod(methods.PUT)).Param(
+						api.Route(Endpoint(Inherit, "Update").SetMethod(methods.PUT)).Param(
 							params.Param(resourceName, target.GetRef()).In(locations.BODY),
 						),
-						api.Route(Endpoint(Inherit).SetMethod(methods.DELETE)),
+						api.Route(Endpoint(Inherit, "Destroy").SetMethod(methods.DELETE)),
 					)...,
 				)),
 			).Param(
