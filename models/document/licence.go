@@ -1,5 +1,5 @@
 package document
 
-type Licence struct {
+type License struct {
 	Name, Url string
 }

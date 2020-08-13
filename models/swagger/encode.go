@@ -7,6 +7,12 @@ func (specs *Instance) Encode() map[string]interface{} {
 	if specs.info != nil {
 		encoded["info"] = specs.info
 	}
+	if len(specs.schemes) > 0 {
+		encoded["schemes"] = specs.schemes
+	}
+	if specs.host != nil {
+		encoded["host"] = specs.host
+	}
 	if specs.basePath != nil {
 		encoded["basePath"] = specs.basePath
 	}
@@ -16,28 +22,26 @@ func (specs *Instance) Encode() map[string]interface{} {
 	if len(specs.definitions) > 0 {
 		definitions := make(map[string]interface{}, len(specs.definitions))
 		for _, d := range specs.definitions {
-			definitions[d.GetName()] = d.GetRef()
+			definitions[d.GetName()] = d.GetRep()
 		}
 		encoded["definitions"] = definitions
 	}
-	if len(specs.paths) > 0 {
-		paths := make(map[string]map[string]interface{})
+	paths := make(map[string]map[string]interface{})
 
-		for i := len(specs.paths) - 1; i >= 0; i-- {
-			route, rep := specs.paths[i].GetPath(), specs.paths[i].GetRep()
-			if rep != nil {
-				if paths[route] == nil {
-					paths[route] = rep
-				} else {
-					for k, v := range rep {
-						paths[route][k] = v
-					}
+	for i := len(specs.paths) - 1; i >= 0; i-- {
+		route, rep := specs.paths[i].GetPath(), specs.paths[i].GetRep()
+		if rep != nil {
+			if paths[route] == nil {
+				paths[route] = rep
+			} else {
+				for k, v := range rep {
+					paths[route][k] = v
 				}
 			}
 		}
-		encoded["paths"] = paths
 	}
-	if len(specs.tags) >0 {
+	encoded["paths"] = paths
+	if len(specs.tags) > 0 {
 		var tags []string
 		for _, t := range specs.tags {
 			tags = append(tags, t.GetName())

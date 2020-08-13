@@ -1,7 +1,7 @@
 package document
 
 type Info struct {
-	Licence
+	License
 	Contact
 	Description, Title, Version string
 	Terms string `yaml:"termsOfService"`

@@ -8,26 +8,26 @@ import (
 
 const Inherit = ""
 
-type Route struct {
+type endpoint struct {
 	path, description string
 	method            methods.Type
 
 	produces, consumes []mimes.Type
-	parameters         []swagger.Definition
+	parameters         []swagger.Parameter
 	tags               []swagger.Tag
 }
 
-func (r *Route) SetPath(s string) swagger.Path {
+func (r *endpoint) SetPath(s string) swagger.Path {
 	r.path = s
 	return r
 }
 
-func (r *Route) SetMethod(m methods.Type) swagger.Path {
+func (r *endpoint) SetMethod(m methods.Type) swagger.Path {
 	r.method = m
 	return r
 }
 
-func (r *Route) GetMethod() string {
+func (r *endpoint) GetMethod() string {
 	if r.method == "" {
 		r.method = methods.GET
 	}
@@ -35,31 +35,31 @@ func (r *Route) GetMethod() string {
 }
 
 
-func (r *Route) GetPath() string {
+func (r *endpoint) GetPath() string {
 	return r.path
 }
 
-func (r *Route) Param(d ...swagger.Definition) swagger.Path {
+func (r *endpoint) Param(d ...swagger.Parameter) swagger.Path {
 	r.parameters = append(r.parameters, d...)
 	return r
 }
 
-func (r *Route) Tag(t ...swagger.Tag) swagger.Path {
+func (r *endpoint) Tag(t ...swagger.Tag) swagger.Path {
 	r.tags = append(r.tags, t...)
 	return r
 }
 
-func (r *Route)Produces(p ...mimes.Type) swagger.Path{
+func (r *endpoint)Produces(p ...mimes.Type) swagger.Path{
 	r.produces = append(r.produces, p...)
 	return r
 }
 
-func (r *Route)Consumes(c ...mimes.Type) swagger.Path {
+func (r *endpoint)Consumes(c ...mimes.Type) swagger.Path {
 	r.consumes = append(r.consumes, c...)
 	return r
 }
 
-func (r *Route) GetRep() map[string]interface{} {
+func (r *endpoint) GetRep() map[string]interface{} {
 	rep:= make(map[string]interface{})
 
 	if r.description != "" {
@@ -82,13 +82,21 @@ func (r *Route) GetRep() map[string]interface{} {
 		rep["consumes"] = r.consumes
 	}
 
+	if len(r.parameters) > 0 {
+		var params []map[string]interface{}
+		for _, p := range r.parameters {
+			params = append(params, p.GetRep())
+		}
+		rep["parameters"] = params
+	}
+
 	return map[string]interface{}{
 		r.GetMethod(): rep,
 	}
 }
 
-func NewRoute(path string) *Route {
-	return &Route{
+func Endpoint(path string) *endpoint {
+	return &endpoint{
 		method: methods.GET,
 		path: path,
 	}
