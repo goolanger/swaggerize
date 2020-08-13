@@ -2,25 +2,25 @@ package model
 
 import "github.com/goolanger/swaggerize/models/swagger"
 
-type _string struct {
+type stringModel struct {
 
 }
 
-func (s _string) GetName() string {
+func (s stringModel) GetName() string {
 	panic("operation not allowed")
 }
 
-func (s _string) GetRep() map[string]interface{} {
+func (s stringModel) GetRep() map[string]interface{} {
 	return map[string]interface{}{
 		"type":"string",
 	}
 }
 
-func (s _string) GetRef() swagger.Definition {
+func (s stringModel) GetRef() swagger.Definition {
 	return s
 }
 
-func String() *_string {
-	return &_string{}
+func String() *stringModel {
+	return &stringModel{}
 }
 

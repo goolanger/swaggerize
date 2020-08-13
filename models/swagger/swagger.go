@@ -96,6 +96,11 @@ func (specs *Instance) Route(p Path) Path {
 }
 
 func (specs *Instance) Tag(t Tag) Tag {
+	for _, t1 := range specs.tags {
+		if t1.GetName() == t.GetName() {
+			return t1
+		}
+	}
 	specs.tags = append(specs.tags, t)
 	return t
 }

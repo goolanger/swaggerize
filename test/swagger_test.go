@@ -4,6 +4,7 @@ import (
 	"github.com/goolanger/swaggerize/models/document"
 	"github.com/goolanger/swaggerize/models/document/licenses"
 	"github.com/goolanger/swaggerize/models/model"
+	"github.com/goolanger/swaggerize/models/model/gorm"
 	"github.com/goolanger/swaggerize/models/path"
 	"github.com/goolanger/swaggerize/models/swagger"
 	"github.com/goolanger/swaggerize/models/types/scheme"
@@ -34,72 +35,71 @@ func TestSwaggerInit(t *testing.T) {
 		})
 
 	tag := api.Define(model.Object("Tag").Props(
-		model.Property("id", model.Int()),
-		model.Property("name", model.String()),
+		gorm.Id(),
+		gorm.String("name", ""),
 	))
 
 	category := api.Define(
 		model.Object("Category").Props(
-			model.Property("id", model.Int()).
-				Tag("x-go-custom-tag", "gorm:\"primary_key;auto_increment:false\""),
-			model.Property("lang", model.String()).
-				Tag("x-go-custom-tag", "gorm:\"primary_key;auto_increment:false;index:lang\""),
-			model.Property("image", model.File()),
-			model.Property("name", model.String()),
-		),
-	)
-
-	offer := api.Define(
-		model.Object("Offer").Props(
-			model.Property("id", model.Int()).
-				Tag("x-go-custom-tag", "gorm:\"primary_key;auto_increment:false\""),
-			model.Property("categoryId", model.Int()),
-			model.Property("shopId", model.Int()),
-			model.Property("name", model.String()),
-			model.Property("availability", model.Enum(model.String(), "available", "pending", "sold out")),
-
-			model.Property("quantity", model.Int()).
-				Description("how many units available for this offer"),
-			model.Property("is_discount", model.Boolean()).
-				Description("offers a discount if true, an absolute price if false"),
-			model.Property("value", model.Number()).
-				Description("either carries a discount percentage or an absolute price depending on is_discount"),
-
-			model.Property("valid_from", model.DateTime()).
-				Description("describes the range start of date-time when the offer is available").
-				Tag("x-go-custom-tag", "gorm:\"Type:timestamp\""),
-			model.Property("valid_until", model.DateTime()).
-				Description("describes the range end of date-time when the offer is available").
-				Tag("x-go-custom-tag", "gorm:\"Type:timestamp\""),
-
-			model.Property("range", model.Enum(model.String(), "near", "area", "city", "state", "country", "global")).
-				Description("the range within this offer will be seen by buyer"),
-
-			model.Property("tags", model.Array(tag.GetRef())),
+			gorm.Id(),
+			gorm.Index("lang", "", model.String()),
+			gorm.File("image",""),
+			gorm.String("name", ""),
 		),
 	)
 
 	shop := api.Define(model.Object("Shop").Props(
-		model.Property("id", model.Int()).
-			Tag("x-go-custom-tag", "gorm:\"primary_key\""),
-		model.Property("name", model.String()).
-			Tag("x-go-custom-tag", "gorm:\"unique_index\""),
+		gorm.Id(),
+		gorm.Index("name", "", model.String()),
 
-		model.Property("city", model.String()),
-		model.Property("zip", model.String()),
-		model.Property("address1", model.String()),
-		model.Property("address2", model.String()),
-		model.Property("vatId", model.String()),
-		model.Property("lat", model.Number()),
-		model.Property("lng", model.Number()),
-		model.Property("openFrom", model.String()),
-		model.Property("openTo", model.String()),
-
+		gorm.String("city",""),
+		gorm.String("zip", ""),
+		gorm.String("address1", ""),
+		gorm.String("address2", ""),
+		gorm.String("vatId", ""),
+		gorm.Number("lat", ""),
+		gorm.Number("lng", ""),
+		gorm.DateTime("openFrom", ""),
+		gorm.DateTime("openTo", ""),
 	))
 
+	offer := api.Define(
+		model.Object("Offer").Props(
+			gorm.Id(),
+			gorm.Reference(category),
+			gorm.Reference(shop),
+
+			gorm.String("name", ""),
+			gorm.Enum("availability", "",
+				model.String(),
+				"available",
+				"pending",
+				"sold out",
+			),
+
+			gorm.Int("quantity", "how many units available for this offer"),
+			gorm.Boolean("is_discount", "offers a discount if true, an absolute price if false"),
+			gorm.Number("value", "either carries a discount percentage or an absolute price depending on is_discount"),
+			gorm.DateTime("valid_from", "describes the range start of date-time when the offer is available"),
+			gorm.DateTime("valid_until", "describes the range ends of date-time when the offer is available"),
+
+			gorm.Enum("range", "the range within this offer will be seen by buyer",
+				model.String(),
+				"near",
+				"area",
+				"city",
+				"state",
+				"country",
+				"global",
+			),
+
+			gorm.Array("tags", "", tag.GetRef()),
+		),
+	)
+
 	api.Define(model.Object("Claims").Props(
-		model.Property("id", model.Int()),
-		model.Property("roles", model.Array(model.String())),
+		gorm.Id(),
+		gorm.Array("roles", "", model.String()),
 	))
 
 	api.Route(path.Resource(api, category, path.Scope(path.Inherit, path.Inherit).Routes(
