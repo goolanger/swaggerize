@@ -1,0 +1,407 @@
+basePath: /api
+definitions:
+  Category:
+    properties:
+      id:
+        format: int64
+        type: integer
+        x-go-custom-tag: gorm:"primary_key;auto_increment:false"
+      image:
+        format: byte
+        type: string
+      lang:
+        type: string
+        x-go-custom-tag: gorm:"primary_key;auto_increment:false;index:lang"
+      name:
+        type: string
+    type: object
+  Offer:
+    properties:
+      availability:
+        enum:
+        - available
+        - pending
+        - sold out
+        type: string
+      categoryId:
+        format: int64
+        type: integer
+      id:
+        format: int64
+        type: integer
+        x-go-custom-tag: gorm:"primary_key;auto_increment:false"
+      is_discount:
+        description: offers a discount if true, an absolute price if false
+        type: boolean
+      name:
+        type: string
+      quantity:
+        description: how many units available for this offer
+        format: int64
+        type: integer
+      range:
+        description: the range within this offer will be seen by buyer
+        enum:
+        - near
+        - area
+        - city
+        - state
+        - country
+        - global
+        type: string
+      shopId:
+        format: int64
+        type: integer
+      tags:
+        items:
+          $ref: '#/definitions/Tag'
+        type: array
+      valid_from:
+        description: describes the range start of date-time when the offer is available
+        format: date-time
+        type: string
+        x-go-custom-tag: gorm:"Type:timestamp"
+      valid_until:
+        description: describes the range end of date-time when the offer is available
+        format: date-time
+        type: string
+        x-go-custom-tag: gorm:"Type:timestamp"
+      value:
+        description: either carries a discount percentage or an absolute price depending
+          on is_discount
+        type: number
+    type: object
+  Shop:
+    properties:
+      address1:
+        type: string
+      address2:
+        type: string
+      city:
+        type: string
+      id:
+        format: int64
+        type: integer
+        x-go-custom-tag: gorm:"primary_key"
+      lat:
+        type: number
+      lng:
+        type: number
+      name:
+        type: string
+        x-go-custom-tag: gorm:"unique_index"
+      openFrom:
+        type: string
+      openTo:
+        type: string
+      vatId:
+        type: string
+      zip:
+        type: string
+    type: object
+  Tag:
+    properties:
+      id:
+        format: int64
+        type: integer
+      name:
+        type: string
+    type: object
+externalDocs:
+  description: For more information read here
+  url: https://swagger.io
+host: localhost:9999
+info:
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  contact:
+    name: API Support
+    url: http://www.swagger.io/support
+    email: support@swagger.io
+  description: This is the swagger description
+  title: Swagger title
+  version: 0.0.1
+  termsOfService: http://swagger.io/terms/
+paths:
+  /category:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ""
+          schema:
+            items:
+              $ref: '#/definitions/Category'
+            type: array
+        "500":
+          description: ""
+          schema:
+            items:
+              type: string
+            type: array
+      tags:
+      - category
+    post:
+      consumes:
+      - multipart/form-data
+      - application/json
+      parameters:
+      - in: body
+        name: category
+        schema:
+          $ref: '#/definitions/Category'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: '#/definitions/Category'
+        "500":
+          description: ""
+          schema:
+            items:
+              type: string
+            type: array
+      tags:
+      - category
+  /category/{categoryId}:
+    delete:
+      parameters:
+      - in: path
+        name: categoryId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: '#/definitions/Category'
+        "500":
+          description: ""
+          schema:
+            items:
+              type: string
+            type: array
+      tags:
+      - category
+    put:
+      parameters:
+      - in: body
+        name: category
+        schema:
+          $ref: '#/definitions/Category'
+      - in: path
+        name: categoryId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: '#/definitions/Category'
+        "500":
+          description: ""
+          schema:
+            items:
+              type: string
+            type: array
+      tags:
+      - category
+  /offer:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ""
+          schema:
+            items:
+              $ref: '#/definitions/Offer'
+            type: array
+        "500":
+          description: ""
+          schema:
+            items:
+              type: string
+            type: array
+      tags:
+      - offer
+    post:
+      consumes:
+      - multipart/form-data
+      - application/json
+      parameters:
+      - in: body
+        name: offer
+        schema:
+          $ref: '#/definitions/Offer'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: '#/definitions/Offer'
+        "500":
+          description: ""
+          schema:
+            items:
+              type: string
+            type: array
+      tags:
+      - offer
+  /offer/{offerId}:
+    delete:
+      parameters:
+      - in: path
+        name: offerId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: '#/definitions/Offer'
+        "500":
+          description: ""
+          schema:
+            items:
+              type: string
+            type: array
+      tags:
+      - offer
+    put:
+      parameters:
+      - in: body
+        name: offer
+        schema:
+          $ref: '#/definitions/Offer'
+      - in: path
+        name: offerId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: '#/definitions/Offer'
+        "500":
+          description: ""
+          schema:
+            items:
+              type: string
+            type: array
+      tags:
+      - offer
+  /shop:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ""
+          schema:
+            items:
+              $ref: '#/definitions/Shop'
+            type: array
+        "500":
+          description: ""
+          schema:
+            items:
+              type: string
+            type: array
+      tags:
+      - shop
+    post:
+      consumes:
+      - multipart/form-data
+      - application/json
+      parameters:
+      - in: body
+        name: shop
+        schema:
+          $ref: '#/definitions/Shop'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: '#/definitions/Shop'
+        "500":
+          description: ""
+          schema:
+            items:
+              type: string
+            type: array
+      tags:
+      - shop
+  /shop/{shopId}:
+    delete:
+      parameters:
+      - in: path
+        name: shopId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: '#/definitions/Shop'
+        "500":
+          description: ""
+          schema:
+            items:
+              type: string
+            type: array
+      tags:
+      - shop
+    put:
+      parameters:
+      - in: body
+        name: shop
+        schema:
+          $ref: '#/definitions/Shop'
+      - in: path
+        name: shopId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: '#/definitions/Shop'
+        "500":
+          description: ""
+          schema:
+            items:
+              type: string
+            type: array
+      tags:
+      - shop
+schemes:
+- https
+- http
+swagger: "2.0"
+tags:
+- name: category
+  description: Default crud resources
+- name: offer
+  description: Default crud resources
+- name: shop
+  description: Default crud resources

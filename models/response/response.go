@@ -7,7 +7,7 @@ import (
 
 type respond struct {
 	code int
-	description *string
+	description string
 	def swagger.Definition
 }
 
@@ -18,9 +18,7 @@ func (r *respond) GetCode() string {
 func (r *respond) GetRep() map[string]interface{} {
 	rep := make(map[string]interface{})
 
-	if r.description != nil {
-		rep["description"] = r.description
-	}
+	rep["description"] = r.description
 
 	if r.def != nil {
 		rep["schema"] = r.def.GetRep()
@@ -37,7 +35,7 @@ func Response(code int, definition swagger.Definition) *respond {
 }
 
 func (r *respond) Description(d string) *respond {
-	r.description = &d
+	r.description = d
 	return r
 }
 

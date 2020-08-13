@@ -12,7 +12,7 @@ type param struct {
 	swagger.Definition
 }
 
-func (p param) GetRep() map[string]interface{} {
+func (p *param) GetRep() map[string]interface{} {
 	rep := make(map[string]interface{})
 
 	if p.in != "" {
@@ -24,9 +24,6 @@ func (p param) GetRep() map[string]interface{} {
 	if p.description != nil {
 		rep["description"] = p.description
 	}
-	if p.required != nil {
-		rep["required"] = p.required
-	}
 	if p.Definition != nil {
 		var _type string
 
@@ -36,14 +33,21 @@ func (p param) GetRep() map[string]interface{} {
 			_type = "type"
 		}
 
+		if p.in == locations.PATH {
+			p.Required(true)
+		}
+
 		rep[_type] = p.Definition.GetRef().GetRep()
 	}
-
+	if p.required != nil {
+		rep["required"] = p.required
+	}
 	return rep
 }
 
-func Param(name string) *param {
+func Param(name string, definition swagger.Definition) *param {
 	return &param{
+		Definition:definition,
 		name: &name,
 	}
 }
@@ -60,10 +64,5 @@ func (p *param) Description(description string) *param {
 
 func (p *param) Required(required bool) *param {
 	p.required = &required
-	return p
-}
-
-func (p *param) Type(definition swagger.Definition) *param {
-	p.Definition = definition
 	return p
 }

@@ -42,11 +42,7 @@ func (specs *Instance) Encode() map[string]interface{} {
 	}
 	encoded["paths"] = paths
 	if len(specs.tags) > 0 {
-		var tags []string
-		for _, t := range specs.tags {
-			tags = append(tags, t.GetName())
-		}
-		encoded["tags"] = tags
+		encoded["tags"] = specs.tags
 	}
 	return encoded
 }

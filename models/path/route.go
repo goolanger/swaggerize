@@ -81,11 +81,11 @@ func (e *endpoint) GetRep() map[string]interface{} {
 	}
 
 	if len(e.produces) > 0 {
-		rep["produces"] = e.produces
+		rep["produces"] = uniq(e.produces)
 	}
 
 	if len(e.consumes) > 0 {
-		rep["consumes"] = e.consumes
+		rep["consumes"] = uniq(e.consumes)
 	}
 
 	if len(e.responses) > 0 {
@@ -116,4 +116,24 @@ func Endpoint(path string) *endpoint {
 		method: methods.GET,
 		path: path,
 	}
+}
+
+func uniq (slice[]mimes.Type) []mimes.Type {
+	var result []mimes.Type
+
+	contains := func(item mimes.Type, col*[]mimes.Type) bool {
+		for _, e := range *col {
+			if e == item {
+				return true
+			}
+		}
+		return false
+	}
+
+	for _, e := range slice {
+		if !contains(e, &result) {
+			result = append(result, e)
+		}
+	}
+	return result
 }

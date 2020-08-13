@@ -6,23 +6,19 @@ import (
 )
 
 func Save(specs *swagger.Instance, path string) error {
+	file, err := os.Create(path)
 
-
-	f, err := os.Open(path)
 	if err != nil {
-		f, err = os.Create(path)
-		if err != nil {
-			return err
-		}
+		return err
 	}
-	defer f.Close()
+	defer file.Close()
 
-	rep, err := Encode(specs)
+	encoded, err := Encode(specs)
 	if err != nil {
 		return err
 	}
 
-	_, err = f.Write(rep)
+	_, err = file.Write(encoded)
 	if err != nil {
 		return err
 	}

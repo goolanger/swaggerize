@@ -5,10 +5,7 @@ import (
 	"github.com/goolanger/swaggerize/models/document/licences"
 	"github.com/goolanger/swaggerize/models/obj"
 	"github.com/goolanger/swaggerize/models/path"
-	"github.com/goolanger/swaggerize/models/response"
 	"github.com/goolanger/swaggerize/models/swagger"
-	"github.com/goolanger/swaggerize/models/types/methods"
-	"github.com/goolanger/swaggerize/models/types/mimes"
 	"github.com/goolanger/swaggerize/models/types/scheme"
 	"github.com/goolanger/swaggerize/pkg/io"
 	"testing"
@@ -41,7 +38,7 @@ func TestSwaggerInit(t *testing.T) {
 		obj.Property("name", obj.String()),
 	))
 
-	api.Define(
+	category := api.Define(
 		obj.Object("Category").Props(
 			obj.Property("id", obj.Int()).
 				Tag("x-go-custom-tag", "gorm:\"primary_key;auto_increment:false\""),
@@ -52,7 +49,7 @@ func TestSwaggerInit(t *testing.T) {
 		),
 	)
 
-	api.Define(
+	offer := api.Define(
 		obj.Object("Offer").Props(
 			obj.Property("id", obj.Int()).
 				Tag("x-go-custom-tag", "gorm:\"primary_key;auto_increment:false\""),
@@ -100,31 +97,17 @@ func TestSwaggerInit(t *testing.T) {
 
 	))
 
-	api.Define(obj.Object("Claims").Props(
-		obj.Property("id", obj.Int()),
-		obj.Property("roles", obj.Array(obj.String())),
-	))
+	//api.Define(obj.Object("Claims").Props(
+	//	obj.Property("id", obj.Int()),
+	//	obj.Property("roles", obj.Array(obj.String())),
+	//))
 
-	api.Route(path.Scope("/shop").Routes(
-		api.Route(path.Endpoint(path.Inherit).SetMethod(methods.POST)),
-		api.Route(path.Endpoint(path.Inherit).SetMethod(methods.PUT)),
-		api.Route(path.Endpoint(path.Inherit).SetMethod(methods.PATCH)),
-	).
-		Consumes(mimes.ApplicationJson).
-		Produces(mimes.ApplicationJson).
-		Responds(
-			response.Response(200, obj.Array(shop.GetRef())),
-			response.Response(404, obj.String()),
-			response.Response(500, obj.String()),
-		))
+	api.Route(path.Resource(api, category))
+	api.Route(path.Resource(api, offer))
+	api.Route(path.Resource(api, shop))
 
-	printSwagger(api, t)
-}
-
-func printSwagger(specs *swagger.Instance, t *testing.T) {
-	rep, err := io.Encode(specs)
+	err := io.Save(api, "swagger.yaml")
 	if err != nil {
 		t.Fatal(err)
 	}
-	t.Log("Instance Specs:\n", string(rep))
 }

@@ -9,6 +9,7 @@ import (
 
 type Tag interface {
 	GetName() string
+	GetRep()map[string]interface{}
 }
 
 type Definition interface {
