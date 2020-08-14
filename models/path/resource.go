@@ -34,7 +34,7 @@ func Resource(api *swagger.Instance, target swagger.Definition, scopes ...*scope
 		for _, s := range scopes {
 			scope.Routes(s.routes...)
 			scope.Tag(s.tags...)
-			scope.Param(s.params...)
+			scope.Params(s.params...)
 			scope.Produces(s.produces...)
 			scope.Consumes(s.consumes...)
 			scope.Responds(s.responses...)
@@ -52,25 +52,25 @@ func Resource(api *swagger.Instance, target swagger.Definition, scopes ...*scope
 				Responds(response.Response(200, model.Array(target.GetRef()))),
 			api.Route(Endpoint(Inherit, "Create")).SetMethod(methods.POST).
 				Consumes(mimes.MultipartFormData, mimes.ApplicationJson).
-				Param(params.Param(resourceName, target.GetRef()).In(locations.BODY)).
+				Params(params.Param(resourceName, target.GetRef()).In(locations.BODY)).
 				Responds(response.Response(200, target.GetRef())),
 			api.Route(
 				res.child(Scope(fmt.Sprintf("/{%s}", resourceId), Inherit).Routes(
 					append(
 						scope.routes,
-						api.Route(Endpoint(Inherit, "Update").SetMethod(methods.PUT)).Param(
+						api.Route(Endpoint(Inherit, "Update").SetMethod(methods.PUT)).Params(
 							params.Param(resourceName, target.GetRef()).In(locations.BODY),
 						),
 						api.Route(Endpoint(Inherit, "Destroy").SetMethod(methods.DELETE)),
 					)...,
 				)),
 			).
-				Param(params.Int(resourceId).In(locations.PATH)).
+				Params(params.Param(resourceId, model.Int()).In(locations.PATH)).
 				Responds(response.Response(200, target.GetRef())),
 		).
 			Produces(mimes.ApplicationJson).
 			Responds(response.Response(500, model.Array(model.String()))).
-			Tag(api.Tag(tags.Tag(resourceName, "Default crud resources"))),
+			Tag(api.Tag(tags.New(resourceName, "Default crud resources"))),
 	)
 
 	return res

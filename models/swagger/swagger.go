@@ -33,7 +33,7 @@ type Path interface {
 
 
 	Consumes(c ...mimes.Type) Path
-	Param(d ...Parameter) Path
+	Params(d ...Parameter) Path
 	Produces(p ...mimes.Type) Path
 	Responds(r ...Response) Path
  	Tag(t ...Tag) Path

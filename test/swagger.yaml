@@ -1,474 +1,215 @@
-basePath: /api
+basePath: /v2
 definitions:
+  ApiResponse:
+    properties:
+      code:
+        format: int32
+        type: integer
+      message:
+        type: string
+      type:
+        type: string
+    type: object
   Category:
     properties:
       id:
         format: int64
         type: integer
-        x-go-custom-tag: gorm:"primary_key"
-      image:
-        description: ""
-        format: byte
-        type: string
-      lang:
-        description: ""
-        type: string
-        x-go-custom-tag: gorm:"unique_index"
       name:
-        description: ""
         type: string
     type: object
-  Claims:
+  New:
     properties:
       id:
         format: int64
         type: integer
-        x-go-custom-tag: gorm:"primary_key"
-      roles:
-        description: ""
+      name:
+        type: string
+    type: object
+  Order:
+    properties:
+      complete:
+        type: boolean
+      id:
+        format: int64
+        type: integer
+      petId:
+        format: int64
+        type: integer
+      quantity:
+        format: int32
+        type: integer
+      shipDate:
+        format: date-time
+        type: string
+      status:
+        enum:
+        - placed
+        - approved
+        - delivered
+        type: string
+    type: object
+  Pet:
+    properties:
+      category:
+        $ref: '#/definitions/Category'
+      id:
+        format: int64
+        type: integer
+      name:
+        example: doggie
+        type: string
+      photoUrls:
         items:
           type: string
         type: array
-    type: object
-  Offer:
-    properties:
-      availability:
-        description: ""
+      status:
         enum:
         - available
         - pending
-        - sold out
+        - sold
         type: string
-      categoryId:
-        description: Category model reference
-        format: int64
-        type: integer
-      id:
-        format: int64
-        type: integer
-        x-go-custom-tag: gorm:"primary_key"
-      is_discount:
-        description: offers a discount if true, an absolute price if false
-        type: boolean
-      name:
-        description: ""
-        type: string
-      quantity:
-        description: how many units available for this offer
-        format: int32
-        type: integer
-      range:
-        description: the range within this offer will be seen by buyer
-        enum:
-        - near
-        - area
-        - city
-        - state
-        - country
-        - global
-        type: string
-      shopId:
-        description: Shop model reference
-        format: int64
-        type: integer
       tags:
-        description: ""
         items:
-          $ref: '#/definitions/Tag'
+          $ref: '#/definitions/New'
         type: array
-      valid_from:
-        description: describes the range start of date-time when the offer is available
-        format: date-time
-        type: string
-        x-go-custom-tag: gorm:"Type:timestamp"
-      valid_until:
-        description: describes the range ends of date-time when the offer is available
-        format: date-time
-        type: string
-        x-go-custom-tag: gorm:"Type:timestamp"
-      value:
-        description: either carries a discount percentage or an absolute price depending
-          on is_discount
-        type: number
-    type: object
-  Shop:
-    properties:
-      address1:
-        description: ""
-        type: string
-      address2:
-        description: ""
-        type: string
-      city:
-        description: ""
-        type: string
-      id:
-        format: int64
-        type: integer
-        x-go-custom-tag: gorm:"primary_key"
-      lat:
-        description: ""
-        type: number
-      lng:
-        description: ""
-        type: number
-      name:
-        description: ""
-        type: string
-        x-go-custom-tag: gorm:"unique_index"
-      openFrom:
-        description: ""
-        format: date-time
-        type: string
-        x-go-custom-tag: gorm:"Type:timestamp"
-      openTo:
-        description: ""
-        format: date-time
-        type: string
-        x-go-custom-tag: gorm:"Type:timestamp"
-      vatId:
-        description: ""
-        type: string
-      zip:
-        description: ""
-        type: string
-    type: object
-  Tag:
-    properties:
-      id:
-        format: int64
-        type: integer
-        x-go-custom-tag: gorm:"primary_key"
-      name:
-        description: ""
-        type: string
     type: object
 externalDocs:
-  description: For more information read here
-  url: https://swagger.io
-host: localhost:9999
+  description: Find out more about Swagger
+  url: http://swagger.io
+host: petstore.swagger.io
 info:
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
   contact:
-    name: API Support
-    url: http://www.swagger.io/support
-    email: support@swagger.io
-  description: This is the swagger description
-  title: Swagger title
-  version: 0.0.1
+    name: amaury95
+    url: amaury95.github.io
+    email: amauryuh@gmail.com
+  description: 'This is a sample server Petstore server.  You can find out more about
+    Swagger at [http://swagger.io](http://swagger.io) or on [irc.freenode.net, #swagger](http://swagger.io/irc/).  For
+    this sample, you can use the api key `special-key` to test the authorization filters.'
+  title: Swagger Petstore
+  version: 1.0.5
   termsOfService: http://swagger.io/terms/
 paths:
-  /category:
-    get:
-      operationId: CategoryList
+  /pet/{petId}:
+    delete:
+      operationId: deletePet
+      parameters:
+      - format: int64
+        in: path
+        name: petId
+        required: true
+        type: integer
       produces:
       - application/json
       responses:
         "200":
-          description: ""
+          description: successful operation
           schema:
-            items:
-              $ref: '#/definitions/Category'
-            type: array
-        "500":
-          description: ""
+            $ref: '#/definitions/Pet'
+        "400":
+          description: invalid id supplied
           schema:
-            items:
-              type: string
-            type: array
+            type: string
+        "404":
+          description: pet not found
+          schema:
+            type: string
       tags:
-      - category
+      - pet
+    get:
+      operationId: getPetById
+      parameters:
+      - format: int64
+        in: path
+        name: petId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: successful operation
+          schema:
+            $ref: '#/definitions/Pet'
+        "400":
+          description: invalid id supplied
+          schema:
+            type: string
+        "404":
+          description: pet not found
+          schema:
+            type: string
+      tags:
+      - pet
+    post:
+      operationId: updatePetWithForm
+      parameters:
+      - in: formData
+        name: name
+        type: string
+      - in: formData
+        name: status
+        type: string
+      - format: int64
+        in: path
+        name: petId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: successful operation
+          schema:
+            $ref: '#/definitions/Pet'
+        "400":
+          description: invalid id supplied
+          schema:
+            type: string
+        "404":
+          description: pet not found
+          schema:
+            type: string
+      tags:
+      - pet
+  /pet/{petId}/uploadImage:
     post:
       consumes:
       - multipart/form-data
-      - application/json
-      operationId: CategoryCreate
+      operationId: uploadFile
       parameters:
-      - in: body
-        name: category
-        schema:
-          $ref: '#/definitions/Category'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: ""
-          schema:
-            $ref: '#/definitions/Category'
-        "500":
-          description: ""
-          schema:
-            items:
-              type: string
-            type: array
-      tags:
-      - category
-  /category/{categoryId}:
-    delete:
-      operationId: CategoryDestroy
-      parameters:
-      - in: path
-        name: categoryId
+      - in: formData
+        name: additionalMetadata
+        type: string
+      - format: byte
+        in: formData
+        name: file
+        type: string
+      - format: int64
+        in: path
+        name: petId
         required: true
         type: integer
       produces:
       - application/json
       responses:
         "200":
-          description: ""
+          description: successful operation
           schema:
-            $ref: '#/definitions/Category'
-        "500":
-          description: ""
-          schema:
-            items:
-              type: string
-            type: array
+            $ref: '#/definitions/ApiResponse'
       tags:
-      - category
-    put:
-      operationId: CategoryUpdate
-      parameters:
-      - in: body
-        name: category
-        schema:
-          $ref: '#/definitions/Category'
-      - in: path
-        name: categoryId
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: ""
-          schema:
-            $ref: '#/definitions/Category'
-        "500":
-          description: ""
-          schema:
-            items:
-              type: string
-            type: array
-      tags:
-      - category
-  /category/{categoryId}/offer:
-    get:
-      operationId: CategoryOfferList
-      parameters:
-      - in: path
-        name: categoryId
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: ""
-          schema:
-            $ref: '#/definitions/Category'
-        "500":
-          description: ""
-          schema:
-            items:
-              type: string
-            type: array
-      tags:
-      - offer
-      - category
-    post:
-      consumes:
-      - multipart/form-data
-      - application/json
-      operationId: CategoryOfferCreate
-      parameters:
-      - in: body
-        name: offer
-        schema:
-          $ref: '#/definitions/Offer'
-      - in: path
-        name: categoryId
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: ""
-          schema:
-            $ref: '#/definitions/Category'
-        "500":
-          description: ""
-          schema:
-            items:
-              type: string
-            type: array
-      tags:
-      - offer
-      - category
-  /category/{categoryId}/offer/{offerId}:
-    delete:
-      operationId: CategoryOfferDestroy
-      parameters:
-      - in: path
-        name: offerId
-        required: true
-        type: integer
-      - in: path
-        name: categoryId
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: ""
-          schema:
-            $ref: '#/definitions/Category'
-        "500":
-          description: ""
-          schema:
-            items:
-              type: string
-            type: array
-      tags:
-      - offer
-      - category
-    put:
-      operationId: CategoryOfferUpdate
-      parameters:
-      - in: body
-        name: offer
-        schema:
-          $ref: '#/definitions/Offer'
-      - in: path
-        name: offerId
-        required: true
-        type: integer
-      - in: path
-        name: categoryId
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: ""
-          schema:
-            $ref: '#/definitions/Category'
-        "500":
-          description: ""
-          schema:
-            items:
-              type: string
-            type: array
-      tags:
-      - offer
-      - category
-  /shop:
-    get:
-      operationId: ShopList
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: ""
-          schema:
-            items:
-              $ref: '#/definitions/Shop'
-            type: array
-        "500":
-          description: ""
-          schema:
-            items:
-              type: string
-            type: array
-      tags:
-      - shop
-    post:
-      consumes:
-      - multipart/form-data
-      - application/json
-      operationId: ShopCreate
-      parameters:
-      - in: body
-        name: shop
-        schema:
-          $ref: '#/definitions/Shop'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: ""
-          schema:
-            $ref: '#/definitions/Shop'
-        "500":
-          description: ""
-          schema:
-            items:
-              type: string
-            type: array
-      tags:
-      - shop
-  /shop/{shopId}:
-    delete:
-      operationId: ShopDestroy
-      parameters:
-      - in: path
-        name: shopId
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: ""
-          schema:
-            $ref: '#/definitions/Shop'
-        "500":
-          description: ""
-          schema:
-            items:
-              type: string
-            type: array
-      tags:
-      - shop
-    put:
-      operationId: ShopUpdate
-      parameters:
-      - in: body
-        name: shop
-        schema:
-          $ref: '#/definitions/Shop'
-      - in: path
-        name: shopId
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: ""
-          schema:
-            $ref: '#/definitions/Shop'
-        "500":
-          description: ""
-          schema:
-            items:
-              type: string
-            type: array
-      tags:
-      - shop
+      - pet
 schemes:
 - https
 - http
 swagger: "2.0"
 tags:
-- name: offer
-  description: Default crud resources
-- name: category
-  description: Default crud resources
-- name: shop
-  description: Default crud resources
+- name: pet
+  description: Everything about your Pets
+- name: store
+  description: Access to Petstore orders
+- name: user
+  description: Operations about user

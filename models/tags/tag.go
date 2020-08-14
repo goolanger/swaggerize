@@ -15,7 +15,7 @@ func (t *tag) GetName() string {
 	return t.Name
 }
 
-func Tag(name, description string) *tag {
+func New(name, description string) *tag {
 	return &tag{Name: name, Description: description}
 }
 

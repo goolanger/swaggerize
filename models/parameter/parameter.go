@@ -25,19 +25,18 @@ func (p *param) GetRep() map[string]interface{} {
 		rep["description"] = p.description
 	}
 	if p.Definition != nil {
-		var _type string
 
 		if p.in == locations.BODY {
-			_type = "schema"
+			rep["schema"] = p.Definition.GetRef().GetRep()
 		} else {
-			_type = "type"
+			for k, v := range p.Definition.GetRef().GetRep() {
+				rep[k] = v
+			}
 		}
 
 		if p.in == locations.PATH {
 			p.Required(true)
 		}
-
-		rep[_type] = p.Definition.GetRef().GetRep()
 	}
 	if p.required != nil {
 		rep["required"] = p.required

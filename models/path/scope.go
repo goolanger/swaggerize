@@ -53,7 +53,7 @@ func (s *scope) GetRep() map[string]interface{} {
 	for _, r := range s.routes {
 		r.SetId(s.GetId() + r.GetId())
 		r.SetPath(s.GetPath() + r.GetPath())
-		r.Param(s.params...)
+		r.Params(s.params...)
 		r.Tag(s.tags...)
 		r.Produces(s.produces...)
 		r.Consumes(s.consumes...)
@@ -62,7 +62,7 @@ func (s *scope) GetRep() map[string]interface{} {
 	return nil
 }
 
-func (s *scope) Param(p ...swagger.Parameter) swagger.Path {
+func (s *scope) Params(p ...swagger.Parameter) swagger.Path {
 	s.params = append(s.params, p...)
 	return s
 }

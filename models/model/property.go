@@ -4,8 +4,9 @@ import "github.com/goolanger/swaggerize/models/swagger"
 
 type property struct {
 	name, description *string
-	tags map[string]interface{}
-	def swagger.Definition
+	tags              map[string]interface{}
+	example           interface{}
+	def               swagger.Definition
 }
 
 func (p *property) GetName() string {
@@ -21,6 +22,10 @@ func (p *property) GetRep() map[string]interface{} {
 
 	if p.description != nil {
 		rep["description"] = p.description
+	}
+
+	if p.example != nil {
+		rep["example"] = p.example
 	}
 
 	return rep
@@ -44,6 +49,11 @@ func (p *property) Tag(key, value string) *property {
 
 func (p *property) Description(description string) *property {
 	p.description = &description
+	return p
+}
+
+func (p *property) Example(elem interface{}) *property {
+	p.example = elem
 	return p
 }
 

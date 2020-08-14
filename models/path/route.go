@@ -49,7 +49,7 @@ func (e *endpoint) GetPath() string {
 	return e.path
 }
 
-func (e *endpoint) Param(d ...swagger.Parameter) swagger.Path {
+func (e *endpoint) Params(d ...swagger.Parameter) swagger.Path {
 	e.parameters = append(e.parameters, d...)
 	return e
 }
