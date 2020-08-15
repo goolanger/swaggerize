@@ -1,6 +1,7 @@
 package path
 
 import (
+	"github.com/goolanger/swaggerize/models/security"
 	"github.com/goolanger/swaggerize/models/swagger"
 	"github.com/goolanger/swaggerize/models/types/methods"
 	"github.com/goolanger/swaggerize/models/types/mimes"
@@ -15,6 +16,7 @@ type endpoint struct {
 	produces, consumes []mimes.Type
 	parameters         []swagger.Parameter
 	responses          []swagger.Response
+	secures			   []swagger.Security
 	tags               []swagger.Tag
 }
 
@@ -51,6 +53,11 @@ func (e *endpoint) GetPath() string {
 
 func (e *endpoint) Params(d ...swagger.Parameter) swagger.Path {
 	e.parameters = append(e.parameters, d...)
+	return e
+}
+
+func (e *endpoint) Secure(c ...swagger.Security) swagger.Path {
+	e.secures = append(e.secures, c...)
 	return e
 }
 
@@ -99,6 +106,17 @@ func (e *endpoint) GetRep() map[string]interface{} {
 		rep["consumes"] = uniq(e.consumes)
 	}
 
+	var secures []interface{}
+	for _, sec := range e.secures {
+		if sec == security.None() {
+			secures = []interface{}{}
+			break
+		}
+		secures = append(secures, sec.GetRep())
+	}
+	rep["security"] = secures
+
+
 	if len(e.responses) > 0 {
 		resp := make(map[string]interface{})
 
@@ -132,21 +150,19 @@ func Endpoint(path, id string) *endpoint {
 	}
 }
 
+func (e *endpoint) Description(s string) *endpoint {
+	e.description = s
+	return e
+}
+
 func uniq (slice[]mimes.Type) []mimes.Type {
 	var result []mimes.Type
-
-	contains := func(item mimes.Type, col*[]mimes.Type) bool {
-		for _, e := range *col {
-			if e == item {
-				return true
-			}
-		}
-		return false
-	}
+	contains := make(map[mimes.Type]bool)
 
 	for _, e := range slice {
-		if !contains(e, &result) {
+		if _, ok := contains[e]; !ok {
 			result = append(result, e)
+			contains[e] = true
 		}
 	}
 	return result

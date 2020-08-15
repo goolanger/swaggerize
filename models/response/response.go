@@ -27,15 +27,15 @@ func (r *respond) GetRep() map[string]interface{} {
 	return rep
 }
 
-func Response(code int, definition swagger.Definition) *respond {
+func Response(code int, desctiption string) *respond {
 	return &respond{
-		def:definition,
+		description: desctiption,
 		code: code,
 	}
 }
 
-func (r *respond) Description(d string) *respond {
-	r.description = d
+func (r *respond) Schema(d swagger.Definition) *respond {
+	r.def = d
 	return r
 }
 

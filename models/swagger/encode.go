@@ -26,8 +26,8 @@ func (specs *Instance) Encode() map[string]interface{} {
 		}
 		encoded["definitions"] = definitions
 	}
-	paths := make(map[string]map[string]interface{})
 
+	paths := make(map[string]map[string]interface{})
 	for i := len(specs.paths) - 1; i >= 0; i-- {
 		route, rep := specs.paths[i].GetPath(), specs.paths[i].GetRep()
 		if rep != nil {
@@ -41,6 +41,15 @@ func (specs *Instance) Encode() map[string]interface{} {
 		}
 	}
 	encoded["paths"] = paths
+
+	if len(specs.secures) > 0 {
+		secures := make(map[string]interface{})
+		for _, s := range specs.secures {
+			secures[s.GetName()] = s.GetRep()
+		}
+		encoded["securityDefinitions"] = secures
+	}
+
 	if len(specs.tags) > 0 {
 		encoded["tags"] = specs.tags
 	}

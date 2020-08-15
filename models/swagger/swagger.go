@@ -22,6 +22,12 @@ type Parameter interface {
 	GetRep()map[string]interface{}
 }
 
+type Security interface {
+	GetName() string
+	GetRep() map[string]interface{}
+	GetRef() Security
+}
+
 type Path interface {
 	SetPath(string) Path
 	GetPath() string
@@ -36,8 +42,8 @@ type Path interface {
 	Params(d ...Parameter) Path
 	Produces(p ...mimes.Type) Path
 	Responds(r ...Response) Path
+	Secure(c ...Security) Path
  	Tag(t ...Tag) Path
-
 }
 
 type Response interface {
@@ -48,6 +54,7 @@ type Response interface {
 type Instance struct {
 	definitions []Definition
 	paths       []Path
+	secures		[]Security
 	tags        []Tag
 
 	basePath, host *string
@@ -93,6 +100,11 @@ func (specs *Instance) Define(d Definition) Definition {
 func (specs *Instance) Route(p Path) Path {
 	specs.paths = append(specs.paths, p)
 	return p
+}
+
+func (specs *Instance) Secure(security Security) Security {
+	specs.secures = append(specs.secures, security)
+	return security
 }
 
 func (specs *Instance) Tag(t Tag) Tag {

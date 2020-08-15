@@ -37,6 +37,7 @@ func Resource(api *swagger.Instance, target swagger.Definition, scopes ...*scope
 			scope.Params(s.params...)
 			scope.Produces(s.produces...)
 			scope.Consumes(s.consumes...)
+			scope.Secure(s.secures...)
 			scope.Responds(s.responses...)
 		}
 	}
@@ -49,11 +50,11 @@ func Resource(api *swagger.Instance, target swagger.Definition, scopes ...*scope
 	res.path(
 		Scope(fmt.Sprintf("/%s", resourceName), fmt.Sprintf(target.GetName())).Routes(
 			api.Route(Endpoint(Inherit, "List")).SetMethod(methods.GET).
-				Responds(response.Response(200, model.Array(target.GetRef()))),
+				Responds(response.Response(200, "").Schema(model.Array(target.GetRef()))),
 			api.Route(Endpoint(Inherit, "Create")).SetMethod(methods.POST).
 				Consumes(mimes.MultipartFormData, mimes.ApplicationJson).
 				Params(params.Param(resourceName, target.GetRef()).In(locations.BODY)).
-				Responds(response.Response(200, target.GetRef())),
+				Responds(response.Response(200, "").Schema(target.GetRef())),
 			api.Route(
 				res.child(Scope(fmt.Sprintf("/{%s}", resourceId), Inherit).Routes(
 					append(
@@ -66,10 +67,10 @@ func Resource(api *swagger.Instance, target swagger.Definition, scopes ...*scope
 				)),
 			).
 				Params(params.Param(resourceId, model.Int()).In(locations.PATH)).
-				Responds(response.Response(200, target.GetRef())),
+				Responds(response.Response(200, "").Schema(target.GetRef())),
 		).
 			Produces(mimes.ApplicationJson).
-			Responds(response.Response(500, model.Array(model.String()))).
+			Responds(response.Response(500, "").Schema(model.Array(model.String()))).
 			Tag(api.Tag(tags.New(resourceName, "Default crud resources"))),
 	)
 

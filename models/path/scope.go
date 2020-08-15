@@ -15,7 +15,8 @@ type scope struct {
 	params []swagger.Parameter
 
 	produces, consumes []mimes.Type
-	responses []swagger.Response
+	secures            []swagger.Security
+	responses          []swagger.Response
 }
 
 func (s *scope) GetId() string {
@@ -55,6 +56,7 @@ func (s *scope) GetRep() map[string]interface{} {
 		r.SetPath(s.GetPath() + r.GetPath())
 		r.Params(s.params...)
 		r.Tag(s.tags...)
+		r.Secure(s.secures...)
 		r.Produces(s.produces...)
 		r.Consumes(s.consumes...)
 		r.Responds(s.responses...)
@@ -79,6 +81,11 @@ func (s *scope) Produces(p ...mimes.Type) swagger.Path {
 
 func (s *scope) Consumes(c ...mimes.Type) swagger.Path {
 	s.consumes  = append(s.consumes, c...)
+	return s
+}
+
+func (s *scope) Secure(c ...swagger.Security) swagger.Path {
+	s.secures = append(s.secures, c...)
 	return s
 }
 

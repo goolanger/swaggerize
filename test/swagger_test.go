@@ -7,6 +7,7 @@ import (
 	params "github.com/goolanger/swaggerize/models/parameter"
 	"github.com/goolanger/swaggerize/models/path"
 	"github.com/goolanger/swaggerize/models/response"
+	"github.com/goolanger/swaggerize/models/security"
 	"github.com/goolanger/swaggerize/models/swagger"
 	"github.com/goolanger/swaggerize/models/tags"
 	"github.com/goolanger/swaggerize/models/types/mimes"
@@ -20,8 +21,8 @@ func TestPetStore(t *testing.T) {
 		Info(document.Info{
 			License: licenses.Apache2,
 			Contact: document.Contact{
-				Name:  "amaury95",
-				Url:   "amaury95.github.io",
+				Name:  "goolanger",
+				Url:   "https://github.com/goolanger",
 				Email: "amauryuh@gmail.com",
 			},
 			Description: "This is a sample server Petstore server.  You can find out more about Swagger at [http://swagger.io](http://swagger.io) or on [irc.freenode.net, #swagger](http://swagger.io/irc/).  For this sample, you can use the api key `special-key` to test the authorization filters.",
@@ -36,6 +37,9 @@ func TestPetStore(t *testing.T) {
 			Description: "Find out more about Swagger",
 			Url:         "http://swagger.io",
 		})
+
+	// Security
+	bearer := api.Secure(security.ApiKey("bearer")).GetRef()
 
 	// Tags
 	petTag := api.Tag(tags.New("pet", "Everything about your Pets"))
@@ -87,27 +91,28 @@ func TestPetStore(t *testing.T) {
 				Params(params.Form("file", model.File())),
 
 			api.Route(path.Get(path.Inherit, "getPetById")).
-				Responds(response.Response(200, pet.GetRef()).Description("successful operation")).
-				Responds(response.Response(400, model.String()).Description("invalid id supplied")).
-				Responds(response.Response(404, model.String()).Description("pet not found")),
+				Responds(response.Response(200, "successful operation").Schema(pet.GetRef())).
+				Responds(response.Response(400, "invalid id supplied").Schema(model.String())).
+				Responds(response.Response(404, "pet not found").Schema(model.String())),
 
 			api.Route(path.Post(path.Inherit, "updatePetWithForm")).
 				Params(params.Form("name", model.String())).
 				Params(params.Form("status", model.String())).
-				Responds(response.Response(200, pet.GetRef()).Description("successful operation")).
-				Responds(response.Response(400, model.String()).Description("invalid id supplied")).
-				Responds(response.Response(404, model.String()).Description("pet not found")),
+				Responds(response.Response(200, "successful operation").Schema(pet.GetRef())).
+				Responds(response.Response(400, "invalid id supplied").Schema(model.String())).
+				Responds(response.Response(404, "pet not found").Schema(model.String())),
 
 			api.Route(path.Delete(path.Inherit, "deletePet")).
-				Responds(response.Response(200, pet.GetRef()).Description("successful operation")).
-				Responds(response.Response(400, model.String()).Description("invalid id supplied")).
-				Responds(response.Response(404, model.String()).Description("pet not found")),
+				Responds(response.Response(200, "successful operation").Schema(pet.GetRef())).
+				Responds(response.Response(400, "invalid id supplied").Schema(model.String())).
+				Responds(response.Response(404, "pet not found").Schema(model.String())).
+				Secure(security.None()),
 		)).
 			Produces(mimes.ApplicationJson).
 			Params(params.Path("petId", model.Int64())).
-			Responds(response.Response(200, apiResponse.GetRef()).Description("successful operation")),
+			Responds(response.Response(200, "successful operation").Schema(apiResponse.GetRef())),
 
-	)).Tag(petTag)
+	)).Tag(petTag).Secure(bearer)
 
 	//Stores scope
 	api.Route(path.Scope("/store", "Store").Routes(
