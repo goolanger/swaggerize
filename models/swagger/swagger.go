@@ -52,10 +52,10 @@ type Response interface {
 }
 
 type Instance struct {
-	definitions []Definition
-	paths       []Path
-	secures		[]Security
-	tags        []Tag
+	definitions         []Definition
+	paths               []Path
+	securities, secures []Security
+	tags                []Tag
 
 	basePath, host *string
 	schemes        []scheme.Type
@@ -100,6 +100,11 @@ func (specs *Instance) Define(d Definition) Definition {
 func (specs *Instance) Route(p Path) Path {
 	specs.paths = append(specs.paths, p)
 	return p
+}
+
+func (specs *Instance) Security(security Security) Security {
+	specs.securities = append(specs.securities, security)
+	return security
 }
 
 func (specs *Instance) Secure(security Security) Security {

@@ -42,12 +42,20 @@ func (specs *Instance) Encode() map[string]interface{} {
 	}
 	encoded["paths"] = paths
 
-	if len(specs.secures) > 0 {
-		secures := make(map[string]interface{})
-		for _, s := range specs.secures {
-			secures[s.GetName()] = s.GetRep()
+	if len(specs.securities) > 0 {
+		securities := make(map[string]interface{})
+		for _, s := range specs.securities {
+			securities[s.GetName()] = s.GetRep()
 		}
-		encoded["securityDefinitions"] = secures
+		encoded["securityDefinitions"] = securities
+	}
+
+	if len(specs.secures) > 0 {
+		var secures []interface{}
+		for _, s := range specs.secures {
+			secures= append(secures, s.GetRef().GetRep())
+		}
+		encoded["security"] = secures
 	}
 
 	if len(specs.tags) > 0 {

@@ -110,11 +110,14 @@ func (e *endpoint) GetRep() map[string]interface{} {
 	for _, sec := range e.secures {
 		if sec == security.None() {
 			secures = []interface{}{}
+			rep["security"] = secures
 			break
 		}
 		secures = append(secures, sec.GetRep())
 	}
-	rep["security"] = secures
+	if len(secures) > 0 {
+		rep["security"] = secures
+	}
 
 
 	if len(e.responses) > 0 {

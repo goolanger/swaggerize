@@ -7,8 +7,8 @@ import (
 
 type apikey struct {
 	name  string
-	description *string
-	in locations.Type
+	description, header *string
+	in *locations.Type
 }
 
 func (a *apikey) GetName() string {
@@ -17,12 +17,19 @@ func (a *apikey) GetName() string {
 
 func (a *apikey) GetRep() map[string]interface{} {
 	rep := map[string]interface{}{
-		"name": a.GetName(),
 		"type": "apiKey",
 	}
 
-	if a.in == "" {
-		a.in = locations.HEADER
+	if a.header == nil {
+		rep["name"] = a.GetName()
+	} else {
+		rep["name"] = a.header
+	}
+
+	if a.in == nil {
+		rep["in"] = locations.HEADER
+	} else {
+		rep["in"] = a.in
 	}
 
 	rep["in"] = a.in
@@ -43,11 +50,16 @@ func ApiKey(name string) *apikey {
 }
 
 func (a *apikey) In (p locations.Type) *apikey {
-	a.in = p
+	a.in = &p
 	return a
 }
 
 func (a *apikey) Description (p string) *apikey {
 	a.description = &p
+	return a
+}
+
+func (a *apikey) Header (h string) *apikey {
+	a.header = &h
 	return a
 }

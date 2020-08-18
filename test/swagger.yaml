@@ -216,7 +216,7 @@ schemes:
 - http
 securityDefinitions:
   bearer:
-    in: header
+    in: null
     name: bearer
     type: apiKey
 swagger: "2.0"

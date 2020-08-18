@@ -39,7 +39,7 @@ func TestPetStore(t *testing.T) {
 		})
 
 	// Security
-	bearer := api.Secure(security.ApiKey("bearer")).GetRef()
+	bearer := api.Security(security.ApiKey("bearer")).GetRef()
 
 	// Tags
 	petTag := api.Tag(tags.New("pet", "Everything about your Pets"))
