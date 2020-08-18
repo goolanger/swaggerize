@@ -6,7 +6,6 @@ import (
 	params "github.com/goolanger/swaggerize/models/parameter"
 	"github.com/goolanger/swaggerize/models/response"
 	"github.com/goolanger/swaggerize/models/swagger"
-	"github.com/goolanger/swaggerize/models/tags"
 	"github.com/goolanger/swaggerize/models/types/locations"
 	"github.com/goolanger/swaggerize/models/types/methods"
 	"github.com/goolanger/swaggerize/models/types/mimes"
@@ -14,11 +13,11 @@ import (
 )
 
 type resource struct {
-	scope *scope
+	scope *scoped
 	swagger.Path
 }
 
-func (res *resource) child(s *scope) swagger.Path {
+func (res *resource) child(s *scoped) swagger.Path {
 	res.scope = s
 	return s
 }
@@ -28,7 +27,7 @@ func (res *resource) path(s swagger.Path) *resource {
 	return res
 }
 
-func Resource(api *swagger.Instance, target swagger.Definition, scopes ...*scope) *resource {
+func Resource(api *swagger.Instance, target swagger.Definition, actions *actions, scopes ...*scoped) *resource {
 	scope := Scope(Inherit, Inherit)
 	if len(scopes) > 0 {
 		for _, s := range scopes {
@@ -44,35 +43,133 @@ func Resource(api *swagger.Instance, target swagger.Definition, scopes ...*scope
 
 	res := &resource{}
 
-	resourceName := strings.ToLower(target.GetName())
-	resourceId := strings.ToLower(target.GetName()) + "Id"
+	resourceName := strings.ToLower(target.GetName()[:1]) + target.GetName()[1:]
+	resourceId := resourceName + "Id"
+
+	//resourceTag := api.Tag(tags.New(resourceName, "crud actions for resource "+resourceName))
+
+	var (
+		internalServerError = response.Response(500, "internal server error").
+			Schema(model.String())
+
+		notFound = response.Response(404, "not found")
+
+		unauthorized = response.Response(401, "unauthorized")
+
+		listResourceOk = response.Response(200, "list resources of type "+resourceName).
+			Schema(model.Array(target.GetRef()))
+
+		createResourceOk = response.Response(201, "created "+resourceName).
+			Schema(target.GetRef())
+
+		updateResourceOk = response.Response(205, "updated "+resourceName).
+			Schema(target.GetRef())
+
+		deleteResourceOk = response.Response(205, "deleted "+resourceName)
+	)
+
+	var (
+		getRoute    swagger.Path = &scoped{}
+		postRoute   swagger.Path = &scoped{}
+		putRoute    swagger.Path = &scoped{}
+		deleteRoute swagger.Path = &scoped{}
+	)
+
+	if actions.get {
+		getRoute = api.Route(Get(Inherit, "List")).
+			Responds(listResourceOk)
+	}
+
+	if actions.post {
+		postRoute = api.Route(Endpoint(Inherit, "Create")).SetMethod(methods.POST).
+			Consumes(mimes.MultipartFormData, mimes.ApplicationJson).
+			Params(params.Param(resourceName, target.GetRef()).In(locations.BODY)).
+			Responds(createResourceOk)
+	}
+
+	if actions.put {
+		putRoute = api.Route(Endpoint(Inherit, "Update").SetMethod(methods.PUT)).Params(
+			params.Param(resourceName, target.GetRef()).In(locations.BODY),
+		).Responds(
+			updateResourceOk,
+		)
+	}
+
+	if actions.del {
+		deleteRoute = api.Route(Endpoint(Inherit, "Destroy").SetMethod(methods.DELETE)).Responds(
+			deleteResourceOk,
+		)
+	}
 
 	res.path(
 		Scope(fmt.Sprintf("/%s", resourceName), fmt.Sprintf(target.GetName())).Routes(
-			api.Route(Endpoint(Inherit, "List")).SetMethod(methods.GET).
-				Responds(response.Response(200, "").Schema(model.Array(target.GetRef()))),
-			api.Route(Endpoint(Inherit, "Create")).SetMethod(methods.POST).
-				Consumes(mimes.MultipartFormData, mimes.ApplicationJson).
-				Params(params.Param(resourceName, target.GetRef()).In(locations.BODY)).
-				Responds(response.Response(200, "").Schema(target.GetRef())),
+			getRoute, postRoute,
 			api.Route(
-				res.child(Scope(fmt.Sprintf("/{%s}", resourceId), Inherit).Routes(
-					append(
-						scope.routes,
-						api.Route(Endpoint(Inherit, "Update").SetMethod(methods.PUT)).Params(
-							params.Param(resourceName, target.GetRef()).In(locations.BODY),
-						),
-						api.Route(Endpoint(Inherit, "Destroy").SetMethod(methods.DELETE)),
-					)...,
-				)),
+				res.child(
+					Scope(fmt.Sprintf("/{%s}", resourceId), Inherit).Routes(
+						append(scope.routes, putRoute, deleteRoute)...),
+				),
 			).
-				Params(params.Param(resourceId, model.Int()).In(locations.PATH)).
-				Responds(response.Response(200, "").Schema(target.GetRef())),
+				Responds(notFound).
+				Params(params.Param(resourceId, model.Int()).In(locations.PATH)),
 		).
 			Produces(mimes.ApplicationJson).
-			Responds(response.Response(500, "").Schema(model.Array(model.String()))).
-			Tag(api.Tag(tags.New(resourceName, "Default crud resources"))),
+			Responds(internalServerError, unauthorized),
+			//Tag(resourceTag),
 	)
 
 	return res
+}
+
+type actions struct {
+	get, post, put, del bool
+}
+
+func Actions() *actions {
+	return &actions{
+		get:  true,
+		post: true,
+		put:  true,
+		del:  true,
+	}
+}
+
+func (a *actions) Get() *actions {
+	a.get = true
+	return a
+}
+
+func (a *actions) Post() *actions {
+	a.post = true
+	return a
+}
+
+func (a *actions) Put() *actions {
+	a.put = true
+	return a
+}
+
+func (a *actions) Delete() *actions {
+	a.del = true
+	return a
+}
+
+func (a *actions) DropGet() *actions {
+	a.get = false
+	return a
+}
+
+func (a *actions) DropPost() *actions {
+	a.post = false
+	return a
+}
+
+func (a *actions) DropPut() *actions {
+	a.put = false
+	return a
+}
+
+func (a *actions) DropDelete() *actions {
+	a.del = false
+	return a
 }

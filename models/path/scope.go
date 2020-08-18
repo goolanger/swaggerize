@@ -6,7 +6,7 @@ import (
 	"github.com/goolanger/swaggerize/models/types/mimes"
 )
 
-type scope struct {
+type scoped struct {
 	path, id string
 
 	routes []swagger.Path
@@ -19,38 +19,38 @@ type scope struct {
 	responses          []swagger.Response
 }
 
-func (s *scope) GetId() string {
+func (s *scoped) GetId() string {
 	return s.id
 }
 
-func (s *scope) SetId(id string) swagger.Path {
+func (s *scoped) SetId(id string) swagger.Path {
 	s.id = id
 	return s
 }
 
-func (s *scope) Responds(r ...swagger.Response) swagger.Path {
+func (s *scoped) Responds(r ...swagger.Response) swagger.Path {
 	s.responses = append(s.responses, r...)
 	return s
 }
 
-func (s *scope) SetPath(p string) swagger.Path {
+func (s *scoped) SetPath(p string) swagger.Path {
 	s.path = p
 	return s
 }
 
-func (s *scope) GetPath() string {
+func (s *scoped) GetPath() string {
 	return s.path
 }
 
-func (s *scope) SetMethod(m methods.Type) swagger.Path {
+func (s *scoped) SetMethod(m methods.Type) swagger.Path {
 	return s
 }
 
-func (s *scope) GetMethod() string {
+func (s *scoped) GetMethod() string {
 	return ""
 }
 
-func (s *scope) GetRep() map[string]interface{} {
+func (s *scoped) GetRep() map[string]interface{} {
 	for _, r := range s.routes {
 		r.SetId(s.GetId() + r.GetId())
 		r.SetPath(s.GetPath() + r.GetPath())
@@ -64,38 +64,38 @@ func (s *scope) GetRep() map[string]interface{} {
 	return nil
 }
 
-func (s *scope) Params(p ...swagger.Parameter) swagger.Path {
+func (s *scoped) Params(p ...swagger.Parameter) swagger.Path {
 	s.params = append(s.params, p...)
 	return s
 }
 
-func (s *scope) Tag(t ...swagger.Tag) swagger.Path {
+func (s *scoped) Tag(t ...swagger.Tag) swagger.Path {
 	s.tags = append(s.tags, t...)
 	return s
 }
 
-func (s *scope) Produces(p ...mimes.Type) swagger.Path {
+func (s *scoped) Produces(p ...mimes.Type) swagger.Path {
 	s.produces = append(s.produces, p...)
 	return s
 }
 
-func (s *scope) Consumes(c ...mimes.Type) swagger.Path {
+func (s *scoped) Consumes(c ...mimes.Type) swagger.Path {
 	s.consumes  = append(s.consumes, c...)
 	return s
 }
 
-func (s *scope) Secure(c ...swagger.Security) swagger.Path {
+func (s *scoped) Secure(c ...swagger.Security) swagger.Path {
 	s.secures = append(s.secures, c...)
 	return s
 }
 
-func (s *scope) Routes(p ...swagger.Path) *scope {
+func (s *scoped) Routes(p ...swagger.Path) *scoped {
 	s.routes = append(s.routes, p...)
 	return s
 }
 
-func Scope(path, id string) *scope {
-	return &scope{
+func Scope(path, id string) *scoped {
+	return &scoped{
 		path: path,
 		id:id,
 	}
