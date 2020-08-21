@@ -144,7 +144,11 @@ func Actions() *actions {
 	}
 }
 
-func (a *actions) Get() *actions {
+func Only() *actions {
+	return &actions{}
+}
+
+func (a *actions) List() *actions {
 	a.get = true
 	return a
 }
@@ -154,22 +158,22 @@ func (a *actions) Fetch() *actions {
 	return a
 }
 
-func (a *actions) Post() *actions {
+func (a *actions) Create() *actions {
 	a.post = true
 	return a
 }
 
-func (a *actions) Put() *actions {
+func (a *actions) Update() *actions {
 	a.put = true
 	return a
 }
 
-func (a *actions) Delete() *actions {
+func (a *actions) Destroy() *actions {
 	a.del = true
 	return a
 }
 
-func (a *actions) DropGet() *actions {
+func (a *actions) DropList() *actions {
 	a.get = false
 	return a
 }
@@ -179,17 +183,17 @@ func (a *actions) DropFetch() *actions {
 	return a
 }
 
-func (a *actions) DropPost() *actions {
+func (a *actions) DropCreate() *actions {
 	a.post = false
 	return a
 }
 
-func (a *actions) DropPut() *actions {
+func (a *actions) DropUpdate() *actions {
 	a.put = false
 	return a
 }
 
-func (a *actions) DropDelete() *actions {
+func (a *actions) DropDestroy() *actions {
 	a.del = false
 	return a
 }

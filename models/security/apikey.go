@@ -5,25 +5,25 @@ import (
 	"github.com/goolanger/swaggerize/models/types/locations"
 )
 
-type apikey struct {
-	name  string
-	description, header *string
-	in *locations.Type
+type apiKey struct {
+	name             string
+	description, key *string
+	in               *locations.Type
 }
 
-func (a *apikey) GetName() string {
+func (a *apiKey) GetName() string {
 	return a.name
 }
 
-func (a *apikey) GetRep() map[string]interface{} {
+func (a *apiKey) GetRep() map[string]interface{} {
 	rep := map[string]interface{}{
 		"type": "apiKey",
 	}
 
-	if a.header == nil {
+	if a.key == nil {
 		rep["name"] = a.GetName()
 	} else {
-		rep["name"] = a.header
+		rep["name"] = a.key
 	}
 
 	if a.in == nil {
@@ -39,25 +39,25 @@ func (a *apikey) GetRep() map[string]interface{} {
 	return rep
 }
 
-func (a *apikey) GetRef() swagger.Security {
+func (a *apiKey) GetRef() swagger.Security {
 	return Reference(a.GetName())
 }
 
-func ApiKey(name string) *apikey {
-	return &apikey{name: name}
+func ApiKey(name string) *apiKey {
+	return &apiKey{name: name}
 }
 
-func (a *apikey) In (p locations.Type) *apikey {
+func (a *apiKey) In (p locations.Type) *apiKey {
 	a.in = &p
 	return a
 }
 
-func (a *apikey) Description (p string) *apikey {
+func (a *apiKey) Description (p string) *apiKey {
 	a.description = &p
 	return a
 }
 
-func (a *apikey) Header (h string) *apikey {
-	a.header = &h
+func (a *apiKey) Key(h string) *apiKey {
+	a.key = &h
 	return a
 }
