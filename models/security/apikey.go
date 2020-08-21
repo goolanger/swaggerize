@@ -32,8 +32,6 @@ func (a *apikey) GetRep() map[string]interface{} {
 		rep["in"] = a.in
 	}
 
-	rep["in"] = a.in
-
 	if a.description != nil {
 		rep["description"] = a.description
 	}

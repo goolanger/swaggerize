@@ -59,6 +59,9 @@ func Resource(api *swagger.Instance, target swagger.Definition, actions *actions
 		listResourceOk = response.Response(200, "list resources of type "+resourceName).
 			Schema(model.Array(target.GetRef()))
 
+		resourceOk = response.Response(200, "fetch resource of type "+resourceName).
+			Schema(target.GetRef())
+
 		createResourceOk = response.Response(201, "created "+resourceName).
 			Schema(target.GetRef())
 
@@ -70,6 +73,7 @@ func Resource(api *swagger.Instance, target swagger.Definition, actions *actions
 
 	var (
 		getRoute    swagger.Path = &scoped{}
+		fetchRoute  swagger.Path = &scoped{}
 		postRoute   swagger.Path = &scoped{}
 		putRoute    swagger.Path = &scoped{}
 		deleteRoute swagger.Path = &scoped{}
@@ -78,6 +82,11 @@ func Resource(api *swagger.Instance, target swagger.Definition, actions *actions
 	if actions.get {
 		getRoute = api.Route(Get(Inherit, "List")).
 			Responds(listResourceOk)
+	}
+
+	if actions.fetch {
+		fetchRoute = api.Route(Get(Inherit, "Fetch")).
+			Responds(resourceOk)
 	}
 
 	if actions.post {
@@ -107,7 +116,7 @@ func Resource(api *swagger.Instance, target swagger.Definition, actions *actions
 			api.Route(
 				res.child(
 					Scope(fmt.Sprintf("/{%s}", resourceId), Inherit).Routes(
-						append(scope.routes, putRoute, deleteRoute)...),
+						append(scope.routes, fetchRoute, putRoute, deleteRoute)...),
 				),
 			).
 				Responds(notFound).
@@ -115,14 +124,14 @@ func Resource(api *swagger.Instance, target swagger.Definition, actions *actions
 		).
 			Produces(mimes.ApplicationJson).
 			Responds(internalServerError, unauthorized),
-			//Tag(resourceTag),
+		//Tag(resourceTag),
 	)
 
 	return res
 }
 
 type actions struct {
-	get, post, put, del bool
+	get, fetch, post, put, del bool
 }
 
 func Actions() *actions {
@@ -131,11 +140,17 @@ func Actions() *actions {
 		post: true,
 		put:  true,
 		del:  true,
+		fetch: true,
 	}
 }
 
 func (a *actions) Get() *actions {
 	a.get = true
+	return a
+}
+
+func (a *actions) Fetch() *actions {
+	a.fetch = true
 	return a
 }
 
@@ -156,6 +171,11 @@ func (a *actions) Delete() *actions {
 
 func (a *actions) DropGet() *actions {
 	a.get = false
+	return a
+}
+
+func (a *actions) DropFetch() *actions {
+	a.fetch = false
 	return a
 }
 
