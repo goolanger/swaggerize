@@ -54,17 +54,17 @@ func TestPetStore(t *testing.T) {
 	))
 
 	category := api.Define(model.Object("Category").Props(
-		model.Property("id", model.Int64()),
+		model.Property("id", model.Long()),
 		model.Property("name", model.String()),
 	))
 
 	tag := api.Define(model.Object("New").Props(
-		model.Property("id", model.Int64()),
+		model.Property("id", model.Long()),
 		model.Property("name", model.String()),
 	))
 
 	pet := api.Define(model.Object("Pet").Props(
-		model.Property("id", model.Int64()),
+		model.Property("id", model.Long()),
 		model.Property("category", category.GetRef()),
 		model.Property("name", model.String()).
 			Example("doggie"),
@@ -74,8 +74,8 @@ func TestPetStore(t *testing.T) {
 	))
 
 	order := api.Define(model.Object("Order").Props(
-		model.Property("id", model.Int64()),
-		model.Property("petId", model.Int64()),
+		model.Property("id", model.Long()),
+		model.Property("petId", model.Long()),
 		model.Property("quantity", model.Int()),
 		model.Property("shipDate", model.DateTime()),
 		model.Property("status", model.Enum(model.String(), "placed", "approved", "delivered")),
@@ -109,7 +109,7 @@ func TestPetStore(t *testing.T) {
 				Secure(security.None()),
 		)).
 			Produces(mimes.ApplicationJson).
-			Params(params.Path("petId", model.Int64())).
+			Params(params.Path("petId", model.Long())).
 			Responds(response.Response(200, "successful operation").Schema(apiResponse.GetRef())),
 
 	)).Tag(petTag).Secure(bearer)

@@ -7,7 +7,7 @@ type boolean struct {
 }
 
 func (b *boolean) GetName() string {
-	panic("implement me")
+	panic("operation not allowed")
 }
 
 func (b *boolean) GetRep() map[string]interface{} {

@@ -2,25 +2,29 @@ package model
 
 import "github.com/goolanger/swaggerize/models/swagger"
 
-type number struct {
-
+type double struct {
+	format string
 }
 
-func (n *number) GetName() string {
-	panic("implement me")
+func (n *double) GetName() string {
+	panic("operation not allowed")
 }
 
-func (n* number) GetRep() map[string]interface{} {
+func (n* double) GetRep() map[string]interface{} {
 	return map[string]interface{}{
+		"format": n.format,
 		"type": "number",
 	}
 }
 
-func (n *number) GetRef() swagger.Definition {
+func (n *double) GetRef() swagger.Definition {
 	return n
 }
 
-func Number() *number {
-	return &number{}
+func Double() *double {
+	return &double{format: "double"}
 }
 
+func Float() *double {
+	return &double{format: "float"}
+}

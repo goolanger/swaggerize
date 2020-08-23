@@ -191,7 +191,7 @@ paths:
       - in: formData
         name: additionalMetadata
         type: string
-      - format: byte
+      - format: file
         in: formData
         name: file
         type: string

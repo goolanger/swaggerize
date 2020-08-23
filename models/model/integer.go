@@ -7,7 +7,7 @@ type integer struct {
 }
 
 func (i *integer) GetName() string {
-	panic("implement me")
+	panic("operation not allowed")
 }
 
 func (i *integer) GetRep() map[string]interface{} {
@@ -25,6 +25,6 @@ func Int() *integer {
 	return &integer{ "int32"}
 }
 
-func Int64() *integer {
+func Long() *integer {
 	return &integer{ "int64"}
 }

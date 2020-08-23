@@ -8,7 +8,7 @@ type enum struct {
 }
 
 func (e *enum) GetName() string {
-	panic("implement me")
+	panic("operation not allowed")
 }
 
 func (e *enum) GetRep() map[string]interface{} {

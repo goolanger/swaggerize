@@ -6,7 +6,7 @@ import (
 )
 
 func Id() swagger.Definition {
-	return model.Property("id", model.Int64() ).
+	return model.Property("id", model.Long() ).
 		Tag("x-go-custom-tag", "gorm:\"primary_key\"")
 }
 

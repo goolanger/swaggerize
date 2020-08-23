@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/goolanger/swaggerize/models/model"
 	params "github.com/goolanger/swaggerize/models/parameter"
+	"github.com/goolanger/swaggerize/models/path/restful"
 	"github.com/goolanger/swaggerize/models/response"
 	"github.com/goolanger/swaggerize/models/swagger"
 	"github.com/goolanger/swaggerize/models/types/locations"
@@ -27,7 +28,7 @@ func (res *resource) path(s swagger.Path) *resource {
 	return res
 }
 
-func Resource(api *swagger.Instance, target swagger.Definition, actions *actions, scopes ...*scoped) *resource {
+func Resource(api *swagger.Instance, target swagger.Definition, actions *restful.Actions, scopes ...*scoped) *resource {
 	scope := Scope(Inherit, Inherit)
 	if len(scopes) > 0 {
 		for _, s := range scopes {
@@ -46,7 +47,7 @@ func Resource(api *swagger.Instance, target swagger.Definition, actions *actions
 	resourceName := strings.ToLower(target.GetName()[:1]) + target.GetName()[1:]
 	resourceId := resourceName + "Id"
 
-	//resourceTag := api.Tag(tags.New(resourceName, "crud actions for resource "+resourceName))
+	//resourceTag := api.Tag(tags.New(resourceName, "crud Actions for resource "+resourceName))
 
 	var (
 		internalServerError = response.Response(500, "internal server error").
@@ -54,7 +55,7 @@ func Resource(api *swagger.Instance, target swagger.Definition, actions *actions
 
 		notFound = response.Response(404, "not found")
 
-		unauthorized = response.Response(401, "unauthorized")
+		forbidden = response.Response(403, "forbidden")
 
 		listResourceOk = response.Response(200, "list resources of type "+resourceName).
 			Schema(model.Array(target.GetRef()))
@@ -79,33 +80,33 @@ func Resource(api *swagger.Instance, target swagger.Definition, actions *actions
 		deleteRoute swagger.Path = &scoped{}
 	)
 
-	if actions.get {
-		getRoute = api.Route(Get(Inherit, "List")).
+	if actions.HasGet {
+		getRoute = api.Route(Get(Inherit, "Get")).
 			Responds(listResourceOk)
 	}
 
-	if actions.fetch {
+	if actions.HasFetch {
 		fetchRoute = api.Route(Get(Inherit, "Fetch")).
 			Responds(resourceOk)
 	}
 
-	if actions.post {
-		postRoute = api.Route(Endpoint(Inherit, "Create")).SetMethod(methods.POST).
+	if actions.HasPost {
+		postRoute = api.Route(Endpoint(Inherit, "Post")).SetMethod(methods.POST).
 			Consumes(mimes.MultipartFormData, mimes.ApplicationJson).
 			Params(params.Param(resourceName, target.GetRef()).In(locations.BODY)).
 			Responds(createResourceOk)
 	}
 
-	if actions.put {
-		putRoute = api.Route(Endpoint(Inherit, "Update").SetMethod(methods.PUT)).Params(
+	if actions.HasPut {
+		putRoute = api.Route(Endpoint(Inherit, "Put").SetMethod(methods.PUT)).Params(
 			params.Param(resourceName, target.GetRef()).In(locations.BODY),
 		).Responds(
 			updateResourceOk,
 		)
 	}
 
-	if actions.del {
-		deleteRoute = api.Route(Endpoint(Inherit, "Destroy").SetMethod(methods.DELETE)).Responds(
+	if actions.HasDelete {
+		deleteRoute = api.Route(Endpoint(Inherit, "Delete").SetMethod(methods.DELETE)).Responds(
 			deleteResourceOk,
 		)
 	}
@@ -120,80 +121,12 @@ func Resource(api *swagger.Instance, target swagger.Definition, actions *actions
 				),
 			).
 				Responds(notFound).
-				Params(params.Param(resourceId, model.Int()).In(locations.PATH)),
+				Params(params.Param(resourceId, model.Long()).In(locations.PATH)),
 		).
 			Produces(mimes.ApplicationJson).
-			Responds(internalServerError, unauthorized),
+			Responds(internalServerError, forbidden),
 		//Tag(resourceTag),
 	)
 
 	return res
-}
-
-type actions struct {
-	get, fetch, post, put, del bool
-}
-
-func Actions() *actions {
-	return &actions{
-		get:  true,
-		post: true,
-		put:  true,
-		del:  true,
-		fetch: true,
-	}
-}
-
-func Only() *actions {
-	return &actions{}
-}
-
-func (a *actions) List() *actions {
-	a.get = true
-	return a
-}
-
-func (a *actions) Fetch() *actions {
-	a.fetch = true
-	return a
-}
-
-func (a *actions) Create() *actions {
-	a.post = true
-	return a
-}
-
-func (a *actions) Update() *actions {
-	a.put = true
-	return a
-}
-
-func (a *actions) Destroy() *actions {
-	a.del = true
-	return a
-}
-
-func (a *actions) DropList() *actions {
-	a.get = false
-	return a
-}
-
-func (a *actions) DropFetch() *actions {
-	a.fetch = false
-	return a
-}
-
-func (a *actions) DropCreate() *actions {
-	a.post = false
-	return a
-}
-
-func (a *actions) DropUpdate() *actions {
-	a.put = false
-	return a
-}
-
-func (a *actions) DropDestroy() *actions {
-	a.del = false
-	return a
 }

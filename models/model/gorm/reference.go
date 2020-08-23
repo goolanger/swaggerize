@@ -8,6 +8,6 @@ import (
 )
 
 func Reference(definition swagger.Definition) swagger.Definition {
-	return model.Property(strings.ToLower(definition.GetName()) + "Id", model.Int64()).
+	return model.Property(strings.ToLower(definition.GetName()) + "Id", model.Long()).
 		Description(fmt.Sprintf("%s model reference", definition.GetName()))
 }

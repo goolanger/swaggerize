@@ -8,3 +8,7 @@ import (
 func Int(name, description string) swagger.Definition{
 	return model.Property(name, model.Int()).Description(description)
 }
+
+func Long(name, description string) swagger.Definition{
+	return model.Property(name, model.Long()).Description(description)
+}
