@@ -6,11 +6,11 @@ type stringModel struct {
 	format *string
 }
 
-func (s stringModel) GetName() string {
+func (s *stringModel) GetName() string {
 	panic("operation not allowed")
 }
 
-func (s stringModel) GetRep() map[string]interface{} {
+func (s *stringModel) GetRep() map[string]interface{} {
 	rep := map[string]interface{}{
 		"type":"string",
 	}
@@ -20,7 +20,7 @@ func (s stringModel) GetRep() map[string]interface{} {
 	return rep
 }
 
-func (s stringModel) GetRef() swagger.Definition {
+func (s *stringModel) GetRef() swagger.Definition {
 	return s
 }
 

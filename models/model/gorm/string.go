@@ -13,7 +13,12 @@ func File(name, description string) swagger.Definition {
 	return model.Property(name, model.File()).Description(description)
 }
 
-func DateTime(name, description string) swagger.Definition {
+func Byte(name, description string) swagger.Definition {
+	return model.Property(name, model.Byte()).Description(description).
+		Tag("x-go-custom-tag", "schema:\"-\"")
+}
+
+func TimeStamp(name, description string) swagger.Definition {
 	return model.Property(name, model.DateTime()).
 		Tag("x-go-custom-tag", "gorm:\"Type:timestamp\"").
 		Description(description)
