@@ -92,7 +92,7 @@ func Resource(api *swagger.Instance, target swagger.Definition, actions *restful
 
 	if actions.HasPost {
 		postRoute = api.Route(Endpoint(Inherit, "Post")).SetMethod(methods.POST).
-			Consumes(mimes.MultipartFormData, mimes.ApplicationJson).
+			Consumes(mimes.ApplicationJson).
 			Params(params.Param(resourceName, target.GetRef()).In(locations.BODY)).
 			Responds(createResourceOk)
 	}
